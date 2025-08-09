@@ -151,11 +151,26 @@ We welcome contributions to the ME-IN platform! Please feel free to submit issue
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## 🚀 Deployment
+
+### Vercel (Recommended)
+1. Visit [https://vercel.com/new](https://vercel.com/new)
+2. Import from GitHub: `josephstore/ME-IN`
+3. Click Deploy - Vercel will automatically detect Next.js configuration
+4. Your app will be live at: `https://me-in-platform.vercel.app`
+
+### Manual Deployment
+```bash
+npm run build
+npm start
+```
+
 ## 📞 Contact
 
 For questions or support, please contact:
 - Email: developer@me-in.com
 - GitHub: [josephstore/ME-IN](https://github.com/josephstore/ME-IN)
+- Live Demo: [https://me-in-platform.vercel.app](https://me-in-platform.vercel.app)
 
 ---
 
