@@ -12,8 +12,12 @@ export const metadata: Metadata = {
   description: 'Connect Korean brands with Middle Eastern influencers through our AI-powered matching platform',
   keywords: 'influencer marketing, middle east, korean brands, social media, marketing platform',
   authors: [{ name: 'ME-IN Team' }],
-  viewport: 'width=device-width, initial-scale=1',
   robots: 'index, follow',
+}
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
 }
 
 export default function RootLayout({
