@@ -159,6 +159,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 3. Click Deploy - Vercel will automatically detect Next.js configuration
 4. Your app will be live at: `https://me-in-platform.vercel.app`
 
+**Live Demo**: [https://me-in-platform.vercel.app](https://me-in-platform.vercel.app)
+
 ### Manual Deployment
 ```bash
 npm run build
