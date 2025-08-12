@@ -2,16 +2,12 @@
 
 import React from 'react';
 import { useAuth } from '@/lib/AuthContext';
-import { useLanguage } from '@/lib/LanguageContext';
 import { 
-  Users, 
   TrendingUp, 
-  DollarSign, 
   Target,
   BarChart3,
   Eye,
   MessageCircle,
-  Share2,
   Plus,
   Filter,
   Search
@@ -20,7 +16,7 @@ import { Button } from '@/components/ui/Button';
 
 const BrandDashboard = () => {
   const { user } = useAuth();
-  const { t } = useLanguage();
+  // const { t } = useLanguage();
 
   const stats = [
     {
@@ -282,3 +278,4 @@ const BrandDashboard = () => {
 };
 
 export default BrandDashboard;
+

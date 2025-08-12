@@ -153,7 +153,7 @@ const CTASection = () => {
                     <span className="text-white text-xs font-semibold">M</span>
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm text-white">Campaign "Summer Beauty" completed</p>
+                    <p className="text-sm text-white">Campaign &quot;Summer Beauty&quot; completed</p>
                     <p className="text-xs text-primary-200">2.1K reach • 15% engagement</p>
                   </div>
                   <button className="text-xs bg-primary-500 text-white px-2 py-1 rounded">
@@ -215,3 +215,4 @@ const CTASection = () => {
 }
 
 export default CTASection
+

@@ -113,7 +113,7 @@ const TestimonialsSection = () => {
 
                 {/* Content */}
                 <p className="text-gray-700 leading-relaxed mb-6 text-lg">
-                  "{testimonial.content}"
+                  &quot;{testimonial.content}&quot;
                 </p>
 
                 {/* Author */}
@@ -181,3 +181,4 @@ const TestimonialsSection = () => {
 }
 
 export default TestimonialsSection
+

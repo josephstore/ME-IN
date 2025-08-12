@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
-import { Menu, X, Globe, User, Search } from 'lucide-react'
+import { Menu, X, Globe, Search } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/lib/LanguageContext'
 import { supportedLanguages, languageNames } from '@/lib/i18n'

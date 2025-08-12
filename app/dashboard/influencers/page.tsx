@@ -2,18 +2,12 @@
 
 import React from 'react';
 import { useAuth } from '@/lib/AuthContext';
-import { useLanguage } from '@/lib/LanguageContext';
 import { 
   Users, 
-  TrendingUp, 
   DollarSign, 
   Heart,
   BarChart3,
-  Eye,
-  MessageCircle,
-  Share2,
   Plus,
-  Filter,
   Search,
   Calendar,
   Award,
@@ -24,7 +18,7 @@ import { Button } from '@/components/ui/Button';
 
 const InfluencerDashboard = () => {
   const { user } = useAuth();
-  const { t } = useLanguage();
+  // const { t } = useLanguage();
 
   const stats = [
     {
@@ -388,3 +382,4 @@ const InfluencerDashboard = () => {
 };
 
 export default InfluencerDashboard;
+
