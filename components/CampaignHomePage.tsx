@@ -80,7 +80,7 @@ export default function CampaignHomePage() {
             {/* Logo */}
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">م</span>
+                <span className="text-white font-bold text-sm" style={{ fontFamily: 'Arial, sans-serif' }}>مين</span>
               </div>
               <span className="text-lg font-bold text-gray-900">ME-IN</span>
             </div>
@@ -139,15 +139,48 @@ export default function CampaignHomePage() {
           {filteredCampaigns.map(campaign => (
             <div key={campaign.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
               {/* Campaign Image */}
-              <div className="relative h-48 bg-gradient-to-br from-blue-100 to-purple-100">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="w-16 h-16 bg-white rounded-lg shadow-md flex items-center justify-center mx-auto mb-2">
-                      <span className="text-2xl">📦</span>
+              <div className="relative h-48 overflow-hidden">
+                {campaign.id === '1' && (
+                  <div className="w-full h-full bg-gradient-to-br from-green-100 to-blue-100 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="w-20 h-20 bg-white rounded-lg shadow-md flex items-center justify-center mx-auto mb-2">
+                        <span className="text-3xl">🧴</span>
+                      </div>
+                      <p className="text-sm text-gray-600 font-medium">CARERY COOLING TONER</p>
                     </div>
-                    <p className="text-sm text-gray-600">Product Image</p>
                   </div>
-                </div>
+                )}
+                {campaign.id === '2' && (
+                  <div className="w-full h-full bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center relative">
+                    <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+                    <div className="text-center relative z-10">
+                      <div className="w-20 h-20 bg-white bg-opacity-20 rounded-lg shadow-md flex items-center justify-center mx-auto mb-2">
+                        <span className="text-3xl">🎤</span>
+                      </div>
+                      <p className="text-sm text-white font-medium">K-POP CONCERT</p>
+                    </div>
+                  </div>
+                )}
+                {campaign.id === '3' && (
+                  <div className="w-full h-full bg-gradient-to-br from-orange-100 to-red-100 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="w-20 h-20 bg-white rounded-lg shadow-md flex items-center justify-center mx-auto mb-2">
+                        <span className="text-3xl">🍜</span>
+                      </div>
+                      <p className="text-sm text-gray-600 font-medium">KOREAN FOOD</p>
+                    </div>
+                  </div>
+                )}
+                {campaign.id === '4' && (
+                  <div className="w-full h-full bg-gradient-to-br from-yellow-100 to-orange-100 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="w-20 h-20 bg-white rounded-lg shadow-md flex items-center justify-center mx-auto mb-2">
+                        <span className="text-3xl">🏛️</span>
+                      </div>
+                      <p className="text-sm text-gray-600 font-medium">DUBAI TRAVEL</p>
+                    </div>
+                  </div>
+                )}
               </div>
               
               {/* Campaign Info */}
