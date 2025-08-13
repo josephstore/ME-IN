@@ -17,7 +17,7 @@ const campaigns: Campaign[] = [
     id: '1',
     title: 'Carery Cooling Toner',
     titleKr: '캐어리 쿨링 토너',
-    image: 'https://me-in-platform.supabase.co/storage/v1/object/public/campaign-images/carery-toner.jpg',
+    image: '/images/carery-toner.jpg',
     price: 'From $100 -',
     category: 'Cosmetics'
   },
@@ -25,7 +25,7 @@ const campaigns: Campaign[] = [
     id: '2',
     title: 'K-pop Concert in Arab',
     titleKr: '케이팝 콘서트 인 아랍',
-    image: 'https://me-in-platform.supabase.co/storage/v1/object/public/campaign-images/kpop-concert.jpg',
+    image: '/images/kpop-concert.jpg',
     price: 'From $100 -',
     category: 'K-pop'
   },
@@ -33,7 +33,7 @@ const campaigns: Campaign[] = [
     id: '3',
     title: 'Korean Food Festival',
     titleKr: '한국 음식 축제',
-    image: 'https://me-in-platform.supabase.co/storage/v1/object/public/campaign-images/korean-food.jpg',
+    image: '/images/korean-food.jpg',
     price: 'From $150 -',
     category: 'Food'
   },
@@ -41,7 +41,7 @@ const campaigns: Campaign[] = [
     id: '4',
     title: 'Dubai Travel Guide',
     titleKr: '두바이 여행 가이드',
-    image: 'https://me-in-platform.supabase.co/storage/v1/object/public/campaign-images/dubai-travel.jpg',
+    image: '/images/dubai-travel.jpg',
     price: 'From $200 -',
     category: 'Travel'
   }
@@ -81,7 +81,7 @@ export default function CampaignHomePage() {
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
                                  <img 
-                   src="https://me-in-platform.supabase.co/storage/v1/object/public/campaign-images/logo.png" 
+                   src="/images/logo.png" 
                    alt="ME-IN Logo" 
                    className="w-6 h-6 object-contain"
                  />

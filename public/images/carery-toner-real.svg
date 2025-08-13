@@ -1,0 +1,32 @@
+<svg width="400" height="200" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="tonerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fefefe;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f5f5f5;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="400" height="200" fill="url(#tonerGradient)"/>
+  
+  <!-- Bottle -->
+  <rect x="180" y="60" width="40" height="100" rx="5" fill="rgba(255,255,255,0.9)" stroke="#94a3b8" stroke-width="2"/>
+  <rect x="185" y="65" width="30" height="90" fill="rgba(34,197,94,0.1)"/>
+  
+  <!-- Cap -->
+  <rect x="185" y="55" width="30" height="10" fill="white" stroke="#94a3b8" stroke-width="1"/>
+  
+  <!-- Label -->
+  <rect x="190" y="80" width="20" height="40" fill="rgba(255,255,255,0.8)"/>
+  <text x="200" y="95" font-family="Arial, sans-serif" font-size="8" font-weight="bold" text-anchor="middle" fill="#374151">CARERY</text>
+  <text x="200" y="105" font-family="Arial, sans-serif" font-size="6" text-anchor="middle" fill="#374151">COOLING</text>
+  <text x="200" y="113" font-family="Arial, sans-serif" font-size="6" text-anchor="middle" fill="#374151">TONER</text>
+  
+  <!-- Leaves -->
+  <ellipse cx="160" cy="100" rx="20" ry="8" fill="#22c55e" opacity="0.7"/>
+  <ellipse cx="240" cy="90" rx="15" ry="6" fill="#22c55e" opacity="0.7"/>
+  <ellipse cx="150" cy="140" rx="12" ry="5" fill="#22c55e" opacity="0.7"/>
+  <ellipse cx="250" cy="150" rx="18" ry="9" fill="#22c55e" opacity="0.7"/>
+  
+  <!-- Additional leaves -->
+  <ellipse cx="140" cy="120" rx="10" ry="4" fill="#16a34a" opacity="0.6"/>
+  <ellipse cx="260" cy="130" rx="12" ry="5" fill="#16a34a" opacity="0.6"/>
+</svg>
