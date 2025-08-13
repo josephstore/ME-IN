@@ -1,0 +1,28 @@
+<svg width="400" height="200" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="foodGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fed7aa;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#fecaca;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="400" height="200" fill="url(#foodGradient)"/>
+  
+  <!-- Bowl -->
+  <ellipse cx="200" cy="120" rx="60" ry="25" fill="#f59e0b" stroke="#d97706" stroke-width="2"/>
+  <ellipse cx="200" cy="115" rx="55" ry="20" fill="#fbbf24"/>
+  
+  <!-- Noodles -->
+  <path d="M 160 110 Q 180 105 200 110 Q 220 115 240 110" stroke="#8b4513" stroke-width="3" fill="none"/>
+  <path d="M 165 115 Q 185 110 200 115 Q 215 120 235 115" stroke="#8b4513" stroke-width="3" fill="none"/>
+  <path d="M 170 120 Q 190 115 200 120 Q 210 125 230 120" stroke="#8b4513" stroke-width="3" fill="none"/>
+  
+  <!-- Vegetables -->
+  <circle cx="180" cy="105" r="4" fill="#22c55e"/>
+  <circle cx="220" cy="108" r="3" fill="#22c55e"/>
+  <circle cx="190" cy="125" r="3" fill="#ef4444"/>
+  <circle cx="210" cy="122" r="4" fill="#ef4444"/>
+  
+  <!-- Steam -->
+  <path d="M 190 90 Q 195 85 200 90 Q 205 95 210 90" stroke="rgba(255,255,255,0.6)" stroke-width="2" fill="none"/>
+  <path d="M 185 85 Q 190 80 195 85 Q 200 90 205 85" stroke="rgba(255,255,255,0.6)" stroke-width="2" fill="none"/>
+</svg>

@@ -80,9 +80,12 @@ export default function CampaignHomePage() {
             {/* Logo */}
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm" style={{ fontFamily: 'Arial, sans-serif' }}>مين</span>
+                                 <img 
+                   src="/images/logo.svg" 
+                   alt="ME-IN Logo" 
+                   className="w-6 h-6 object-contain"
+                 />
               </div>
-              <span className="text-lg font-bold text-gray-900">ME-IN</span>
             </div>
             
             {/* Notifications */}
@@ -140,47 +143,34 @@ export default function CampaignHomePage() {
             <div key={campaign.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
               {/* Campaign Image */}
               <div className="relative h-48 overflow-hidden">
-                {campaign.id === '1' && (
-                  <div className="w-full h-full bg-gradient-to-br from-green-100 to-blue-100 flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="w-20 h-20 bg-white rounded-lg shadow-md flex items-center justify-center mx-auto mb-2">
-                        <span className="text-3xl">🧴</span>
-                      </div>
-                      <p className="text-sm text-gray-600 font-medium">CARERY COOLING TONER</p>
-                    </div>
-                  </div>
-                )}
-                {campaign.id === '2' && (
-                  <div className="w-full h-full bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center relative">
-                    <div className="absolute inset-0 bg-black bg-opacity-20"></div>
-                    <div className="text-center relative z-10">
-                      <div className="w-20 h-20 bg-white bg-opacity-20 rounded-lg shadow-md flex items-center justify-center mx-auto mb-2">
-                        <span className="text-3xl">🎤</span>
-                      </div>
-                      <p className="text-sm text-white font-medium">K-POP CONCERT</p>
-                    </div>
-                  </div>
-                )}
-                {campaign.id === '3' && (
-                  <div className="w-full h-full bg-gradient-to-br from-orange-100 to-red-100 flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="w-20 h-20 bg-white rounded-lg shadow-md flex items-center justify-center mx-auto mb-2">
-                        <span className="text-3xl">🍜</span>
-                      </div>
-                      <p className="text-sm text-gray-600 font-medium">KOREAN FOOD</p>
-                    </div>
-                  </div>
-                )}
-                {campaign.id === '4' && (
-                  <div className="w-full h-full bg-gradient-to-br from-yellow-100 to-orange-100 flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="w-20 h-20 bg-white rounded-lg shadow-md flex items-center justify-center mx-auto mb-2">
-                        <span className="text-3xl">🏛️</span>
-                      </div>
-                      <p className="text-sm text-gray-600 font-medium">DUBAI TRAVEL</p>
-                    </div>
-                  </div>
-                )}
+                                 {campaign.id === '1' && (
+                   <img 
+                     src="/images/carery-toner.svg" 
+                     alt="Carery Cooling Toner"
+                     className="w-full h-full object-cover"
+                   />
+                 )}
+                 {campaign.id === '2' && (
+                   <img 
+                     src="/images/kpop-concert.svg" 
+                     alt="K-pop Concert"
+                     className="w-full h-full object-cover"
+                   />
+                 )}
+                 {campaign.id === '3' && (
+                   <img 
+                     src="/images/korean-food.svg" 
+                     alt="Korean Food Festival"
+                     className="w-full h-full object-cover"
+                   />
+                 )}
+                 {campaign.id === '4' && (
+                   <img 
+                     src="/images/dubai-travel.svg" 
+                     alt="Dubai Travel Guide"
+                     className="w-full h-full object-cover"
+                   />
+                 )}
               </div>
               
               {/* Campaign Info */}

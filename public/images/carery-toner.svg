@@ -1,0 +1,21 @@
+<svg width="400" height="200" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="tonerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#dcfce7;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#dbeafe;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="400" height="200" fill="url(#tonerGradient)"/>
+  
+  <!-- Bottle -->
+  <rect x="180" y="80" width="40" height="80" rx="5" fill="rgba(255,255,255,0.8)" stroke="#94a3b8" stroke-width="2"/>
+  <rect x="185" y="85" width="30" height="70" fill="rgba(34,197,94,0.3)"/>
+  <text x="200" y="130" font-family="Arial, sans-serif" font-size="8" text-anchor="middle" fill="#374151">CARERY</text>
+  <text x="200" y="140" font-family="Arial, sans-serif" font-size="8" text-anchor="middle" fill="#374151">TONER</text>
+  
+  <!-- Leaves -->
+  <ellipse cx="160" cy="100" rx="15" ry="8" fill="#22c55e" opacity="0.6"/>
+  <ellipse cx="240" cy="90" rx="12" ry="6" fill="#22c55e" opacity="0.6"/>
+  <ellipse cx="150" cy="140" rx="10" ry="5" fill="#22c55e" opacity="0.6"/>
+  <ellipse cx="250" cy="150" rx="18" ry="9" fill="#22c55e" opacity="0.6"/>
+</svg>
