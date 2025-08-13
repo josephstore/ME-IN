@@ -1,37 +1,40 @@
 # ME-IN Platform
 ## MiddleEast Influencer Network
 
-ME-IN is a comprehensive platform that connects Korean brands with Middle Eastern influencers through AI-powered matching and analytics.
+ME-IN은 한국 브랜드와 중동 인플루언서를 연결하는 모바일 친화적인 캠페인 플랫폼입니다. 브랜드들이 캠페인을 등록하고 인플루언서들이 참여할 수 있는 직관적인 인터페이스를 제공합니다.
 
 ## 🌟 Features
 
 ### Core Functionality
-- **AI-Powered Matching**: Smart algorithm matches brands with influencers based on content similarity, audience overlap, and performance history
-- **Multi-language Support**: Full support for Korean, English, and Arabic
-- **Real-time Analytics**: Track campaign performance with detailed metrics and insights
-- **Secure Authentication**: Role-based access control for brands and influencers
+- **모바일 최적화**: 모바일 기기에 최적화된 반응형 디자인
+- **캠페인 등록**: 브랜드가 쉽게 캠페인을 등록하고 관리
+- **실시간 검색**: 카테고리별 필터링과 검색 기능
+- **한국어 우선**: 한국어 위주의 다국어 지원 (한국어, 영어, 아랍어)
+- **직관적 UI**: 사용하기 쉬운 모바일 친화적 인터페이스
 
-### For Brands
-- **Campaign Management**: Create, manage, and track influencer campaigns
-- **Influencer Discovery**: Find the perfect content creators for your brand
-- **Performance Dashboard**: Monitor ROI, reach, and engagement metrics
-- **Budget Management**: Set and track campaign budgets efficiently
+### For Brands (브랜드용)
+- **캠페인 등록**: 제품/서비스 캠페인을 쉽게 등록
+- **인플루언서 매칭**: 적합한 인플루언서 자동 매칭
+- **성과 추적**: 캠페인 성과 실시간 모니터링
+- **예산 관리**: 캠페인 예산 설정 및 관리
 
-### For Influencers
-- **Opportunity Discovery**: Find brand partnerships that match your content style
-- **Earnings Tracking**: Monitor your income and performance metrics
-- **Portfolio Management**: Showcase your best content and achievements
-- **Campaign Collaboration**: Seamless workflow with brands
+### For Influencers (인플루언서용)
+- **캠페인 발견**: 관심 카테고리별 캠페인 탐색
+- **참여 신청**: 원하는 캠페인에 쉽게 참여 신청
+- **수익 관리**: 참여한 캠페인 수익 추적
+- **포트폴리오**: 활동 내역 및 성과 관리
 
 ## 🛠 Tech Stack
 
 - **Frontend**: Next.js 14, React 18, TypeScript
 - **Styling**: Tailwind CSS, Framer Motion
-- **Authentication**: Custom JWT-based system
+- **Authentication**: Supabase Auth
+- **Database**: Supabase PostgreSQL
 - **Internationalization**: Custom i18n implementation
 - **State Management**: React Context API
 - **Icons**: Lucide React
-- **Notifications**: React Hot Toast
+- **Mobile UI**: 모바일 최적화 컴포넌트
+- **Real-time**: Supabase Realtime
 
 ## 🚀 Getting Started
 
@@ -111,14 +114,16 @@ ME-IN/
 │   ├── dashboard/         # Dashboard pages
 │   ├── globals.css        # Global styles
 │   ├── layout.tsx         # Root layout
-│   └── page.tsx           # Home page
+│   └── page.tsx           # Home page (모바일 캠페인 홈)
 ├── components/            # React components
+│   ├── CampaignHomePage.tsx # 모바일 캠페인 홈페이지
 │   ├── layout/            # Layout components
 │   ├── sections/          # Page sections
 │   └── ui/                # UI components
 ├── lib/                   # Utility libraries
 │   ├── types/             # TypeScript type definitions
-│   ├── AuthContext.tsx    # Authentication context
+│   ├── SupabaseAuthContext.tsx # Supabase 인증 컨텍스트
+│   ├── supabase.ts        # Supabase 클라이언트
 │   ├── LanguageContext.tsx # Internationalization context
 │   ├── i18n.ts            # Translation definitions
 │   └── utils.ts           # Utility functions
@@ -127,68 +132,76 @@ ME-IN/
 
 ## 🌐 Internationalization
 
-ME-IN supports three languages:
-- **Korean (ko)**: 한국어
+ME-IN은 세 가지 언어를 지원합니다:
+- **Korean (ko)**: 한국어 (기본 언어)
 - **English (en)**: English  
 - **Arabic (ar)**: العربية
 
-The platform automatically detects the user's preferred language and provides seamless language switching.
+플랫폼은 사용자의 선호 언어를 자동으로 감지하고 원활한 언어 전환을 제공합니다.
 
 ## 🔐 Authentication System
 
-The platform features a comprehensive authentication system with:
-- User registration and login
-- Role-based access (Brand/Influencer)
-- JWT-based session management
-- Secure password handling
+플랫폼은 Supabase 기반의 포괄적인 인증 시스템을 제공합니다:
+- 사용자 등록 및 로그인
+- 역할 기반 접근 (브랜드/인플루언서)
+- Supabase 세션 관리
+- 안전한 비밀번호 처리
 
-## 📊 Dashboard Features
+## 📱 Mobile Campaign Features
 
-### Brand Dashboard
-- Campaign overview and management
-- Influencer discovery and matching
-- Performance analytics
-- ROI tracking
+### 모바일 홈화면
+- **캠페인 카드**: 제품/서비스 캠페인을 카드 형태로 표시
+- **실시간 검색**: 제품명으로 실시간 검색
+- **카테고리 필터**: Food, K-pop, Cosmetics, Travel 등 카테고리별 필터링
+- **JOIN 버튼**: 인플루언서가 캠페인에 쉽게 참여
 
-### Influencer Dashboard
-- Earnings and performance metrics
-- Campaign opportunities
-- Content portfolio management
-- Brand collaboration tools
+### 브랜드 대시보드
+- 캠페인 개요 및 관리
+- 인플루언서 발견 및 매칭
+- 성과 분석
+- ROI 추적
+
+### 인플루언서 대시보드
+- 수익 및 성과 지표
+- 캠페인 기회
+- 콘텐츠 포트폴리오 관리
+- 브랜드 협업 도구
 
 ## 🎨 Design System
 
-ME-IN uses a modern, responsive design system built with:
-- Tailwind CSS for styling
-- Framer Motion for animations
-- Lucide React for icons
-- Custom color palette optimized for Middle Eastern markets
+ME-IN은 모바일 최적화된 현대적인 디자인 시스템을 사용합니다:
+- Tailwind CSS로 스타일링
+- Framer Motion으로 애니메이션
+- Lucide React로 아이콘
+- 중동 시장에 최적화된 커스텀 색상 팔레트
+- 모바일 우선 반응형 디자인
 
 ## 🔄 Development Status
 
 ### Completed Features ✅
-- [x] Basic platform setup and configuration
-- [x] Multi-language support system
-- [x] User authentication system
-- [x] Brand and Influencer dashboards
-- [x] Login/Registration pages
-- [x] Responsive design implementation
+- [x] 모바일 캠페인 홈페이지 구현
+- [x] Supabase 인증 시스템 구축
+- [x] 다국어 지원 시스템 (한국어 우선)
+- [x] 브랜드 및 인플루언서 대시보드
+- [x] 로그인/회원가입 페이지
+- [x] 모바일 최적화 반응형 디자인
+- [x] 캠페인 카드 및 필터링 시스템
 
 ### In Progress 🔄
-- [ ] Profile management system
-- [ ] Advanced search and filtering
-- [ ] Campaign creation and management
-- [ ] AI matching algorithm implementation
+- [ ] 프로필 관리 시스템
+- [ ] 고급 검색 및 필터링
+- [ ] 캠페인 생성 및 관리
+- [ ] AI 매칭 알고리즘 구현
 
 ### Planned Features 📋
-- [ ] Real-time notifications
-- [ ] Payment system integration
-- [ ] Advanced analytics dashboard
-- [ ] Mobile app development
+- [ ] 실시간 알림 시스템
+- [ ] 결제 시스템 통합
+- [ ] 고급 분석 대시보드
+- [ ] 네이티브 모바일 앱 개발
 
 ## 🤝 Contributing
 
-We welcome contributions to the ME-IN platform! Please feel free to submit issues, feature requests, or pull requests.
+ME-IN 플랫폼에 기여를 환영합니다! 이슈, 기능 요청 또는 풀 리퀘스트를 자유롭게 제출해 주세요.
 
 ## 📄 License
 
@@ -196,13 +209,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🚀 Deployment
 
-### Vercel (Recommended)
-1. Visit [https://vercel.com/new](https://vercel.com/new)
-2. Import from GitHub: `josephstore/ME-IN`
-3. Click Deploy - Vercel will automatically detect Next.js configuration
-4. Your app will be live at: `https://me-in-platform.vercel.app`
+### Vercel (권장)
+1. [https://vercel.com/new](https://vercel.com/new) 방문
+2. GitHub에서 `josephstore/ME-IN` 가져오기
+3. Deploy 클릭 - Vercel이 Next.js 설정을 자동으로 감지
+4. 앱이 다음 주소에서 라이브됩니다: `https://me-in.vercel.app`
 
-**Live Demo**: [https://me-in-platform.vercel.app](https://me-in-platform.vercel.app)
+**Live Demo**: [https://me-in.vercel.app](https://me-in.vercel.app)
 
 ### Manual Deployment
 ```bash
@@ -212,11 +225,11 @@ npm start
 
 ## 📞 Contact
 
-For questions or support, please contact:
+문의사항이나 지원이 필요하시면 다음으로 연락해 주세요:
 - Email: developer@me-in.com
 - GitHub: [josephstore/ME-IN](https://github.com/josephstore/ME-IN)
-- Live Demo: [https://me-in-platform.vercel.app](https://me-in-platform.vercel.app)
+- Live Demo: [https://me-in.vercel.app](https://me-in.vercel.app)
 
 ---
 
-Built with ❤️ for connecting Korean brands with Middle Eastern influencers
+한국 브랜드와 중동 인플루언서를 연결하기 위해 ❤️로 제작되었습니다
