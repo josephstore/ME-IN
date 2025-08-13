@@ -17,7 +17,7 @@ const campaigns: Campaign[] = [
     id: '1',
     title: 'Carery Cooling Toner',
     titleKr: '캐어리 쿨링 토너',
-    image: '/images/carery-toner.jpg',
+    image: 'https://me-in-platform.supabase.co/storage/v1/object/public/campaign-images/carery-toner.jpg',
     price: 'From $100 -',
     category: 'Cosmetics'
   },
@@ -25,7 +25,7 @@ const campaigns: Campaign[] = [
     id: '2',
     title: 'K-pop Concert in Arab',
     titleKr: '케이팝 콘서트 인 아랍',
-    image: '/images/kpop-concert.jpg',
+    image: 'https://me-in-platform.supabase.co/storage/v1/object/public/campaign-images/kpop-concert.jpg',
     price: 'From $100 -',
     category: 'K-pop'
   },
@@ -33,7 +33,7 @@ const campaigns: Campaign[] = [
     id: '3',
     title: 'Korean Food Festival',
     titleKr: '한국 음식 축제',
-    image: '/images/korean-food.jpg',
+    image: 'https://me-in-platform.supabase.co/storage/v1/object/public/campaign-images/korean-food.jpg',
     price: 'From $150 -',
     category: 'Food'
   },
@@ -41,7 +41,7 @@ const campaigns: Campaign[] = [
     id: '4',
     title: 'Dubai Travel Guide',
     titleKr: '두바이 여행 가이드',
-    image: '/images/dubai-travel.jpg',
+    image: 'https://me-in-platform.supabase.co/storage/v1/object/public/campaign-images/dubai-travel.jpg',
     price: 'From $200 -',
     category: 'Travel'
   }
@@ -81,7 +81,7 @@ export default function CampaignHomePage() {
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
                                  <img 
-                   src="/images/logo.svg" 
+                   src="https://me-in-platform.supabase.co/storage/v1/object/public/campaign-images/logo.png" 
                    alt="ME-IN Logo" 
                    className="w-6 h-6 object-contain"
                  />
@@ -143,34 +143,11 @@ export default function CampaignHomePage() {
             <div key={campaign.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
               {/* Campaign Image */}
               <div className="relative h-48 overflow-hidden">
-                                 {campaign.id === '1' && (
-                   <img 
-                     src="/images/carery-toner.svg" 
-                     alt="Carery Cooling Toner"
-                     className="w-full h-full object-cover"
-                   />
-                 )}
-                 {campaign.id === '2' && (
-                   <img 
-                     src="/images/kpop-concert.svg" 
-                     alt="K-pop Concert"
-                     className="w-full h-full object-cover"
-                   />
-                 )}
-                 {campaign.id === '3' && (
-                   <img 
-                     src="/images/korean-food.svg" 
-                     alt="Korean Food Festival"
-                     className="w-full h-full object-cover"
-                   />
-                 )}
-                 {campaign.id === '4' && (
-                   <img 
-                     src="/images/dubai-travel.svg" 
-                     alt="Dubai Travel Guide"
-                     className="w-full h-full object-cover"
-                   />
-                 )}
+                                 <img 
+                   src={campaign.image}
+                   alt={campaign.title}
+                   className="w-full h-full object-cover"
+                 />
               </div>
               
               {/* Campaign Info */}
