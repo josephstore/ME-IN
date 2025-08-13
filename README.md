@@ -38,6 +38,49 @@ ME-IN is a comprehensive platform that connects Korean brands with Middle Easter
 ### Prerequisites
 - Node.js (v18 or higher)
 - npm or yarn
+- Supabase account
+
+### Supabase Setup
+
+1. **Create Supabase Project**
+   - Visit [https://supabase.com](https://supabase.com)
+   - Create a new project
+   - Note down your project URL and anon key
+
+2. **Environment Variables**
+   Create a `.env.local` file in the root directory:
+   ```bash
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
+
+3. **Database Schema**
+   Run the following SQL in your Supabase SQL editor:
+   ```sql
+   -- Enable Row Level Security
+   ALTER TABLE auth.users ENABLE ROW LEVEL SECURITY;
+   
+   -- Create profiles table
+   CREATE TABLE profiles (
+     id UUID REFERENCES auth.users(id) PRIMARY KEY,
+     name TEXT,
+     user_type TEXT CHECK (user_type IN ('brand', 'influencer')),
+     language TEXT[],
+     timezone TEXT,
+     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+   );
+   
+   -- Create RLS policies
+   CREATE POLICY "Users can view own profile" ON profiles
+     FOR SELECT USING (auth.uid() = id);
+   
+   CREATE POLICY "Users can update own profile" ON profiles
+     FOR UPDATE USING (auth.uid() = id);
+   
+   CREATE POLICY "Users can insert own profile" ON profiles
+     FOR INSERT WITH CHECK (auth.uid() = id);
+   ```
 
 ### Installation
 

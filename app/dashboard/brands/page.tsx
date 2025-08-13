@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useAuth } from '@/lib/AuthContext';
+import { useSupabaseAuth } from '@/lib/SupabaseAuthContext';
 import { 
   TrendingUp, 
   Target,
@@ -15,7 +15,7 @@ import {
 import { Button } from '@/components/ui/Button';
 
 const BrandDashboard = () => {
-  const { user } = useAuth();
+  const { user } = useSupabaseAuth();
   // const { t } = useLanguage();
 
   const stats = [
@@ -121,7 +121,7 @@ const BrandDashboard = () => {
           <div className="flex justify-between items-center h-16">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Brand Dashboard</h1>
-              <p className="text-sm text-gray-600">Welcome back, {user?.profile.name}</p>
+              <p className="text-sm text-gray-600">Welcome back, {user?.user_metadata?.name || 'User'}</p>
             </div>
             <div className="flex space-x-3">
               <Button variant="outline" size="sm">

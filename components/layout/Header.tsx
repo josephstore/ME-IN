@@ -7,16 +7,17 @@ import { Menu, X, Globe, Search } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/lib/LanguageContext'
 import { supportedLanguages, languageNames } from '@/lib/i18n'
-import { useAuth } from '@/lib/AuthContext'
+import { useSupabaseAuth } from '@/lib/SupabaseAuthContext'
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { language, setLanguage, t } = useLanguage()
-  const { user, isAuthenticated, logout } = useAuth()
+  const { user, signOut } = useSupabaseAuth()
+  const isAuthenticated = !!user
 
   const navigation = isAuthenticated ? [
     { name: t('nav.home'), href: '/' },
-    { name: 'Dashboard', href: user?.userType === 'brand' ? '/dashboard/brands' : '/dashboard/influencers' },
+    { name: 'Dashboard', href: user?.user_metadata?.user_type === 'brand' ? '/dashboard/brands' : '/dashboard/influencers' },
     { name: t('nav.campaigns'), href: '/campaigns' },
     { name: t('nav.about'), href: '/about' },
     { name: t('nav.contact'), href: '/contact' },
@@ -89,8 +90,8 @@ const Header = () => {
             <div className="flex items-center space-x-2">
               {isAuthenticated ? (
                 <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-600">{user?.profile.name}</span>
-                  <Button variant="outline" size="sm" onClick={logout}>
+                  <span className="text-sm text-gray-600">{user?.user_metadata?.name || 'User'}</span>
+                  <Button variant="outline" size="sm" onClick={signOut}>
                     {t('nav.logout')}
                   </Button>
                 </div>
@@ -165,8 +166,8 @@ const Header = () => {
                 <div className="px-3 py-2 space-y-2">
                   {isAuthenticated ? (
                     <>
-                      <span className="text-sm text-gray-600 px-3 py-2">{user?.profile.name}</span>
-                      <Button variant="outline" size="sm" className="w-full" onClick={logout}>
+                      <span className="text-sm text-gray-600 px-3 py-2">{user?.user_metadata?.name || 'User'}</span>
+                      <Button variant="outline" size="sm" className="w-full" onClick={signOut}>
                         {t('nav.logout')}
                       </Button>
                     </>
