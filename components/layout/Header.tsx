@@ -90,7 +90,12 @@ const Header = () => {
             <div className="flex items-center space-x-2">
               {isAuthenticated ? (
                 <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-600">{user?.user_metadata?.name || 'User'}</span>
+                  <Link 
+                    href="/profile" 
+                    className="text-sm text-gray-600 hover:text-orange-500 transition-colors"
+                  >
+                    {user?.user_metadata?.name || 'User'}
+                  </Link>
                   <Button variant="outline" size="sm" onClick={signOut}>
                     {t('nav.logout')}
                   </Button>

@@ -2,7 +2,7 @@ import { supabase } from './supabase'
 
 export const uploadImage = async (file: File, path: string) => {
   try {
-    const { data, error } = await supabase.storage
+    const { error } = await supabase.storage
       .from('campaign-images')
       .upload(path, file, {
         cacheControl: '3600',
