@@ -79,13 +79,19 @@ export default function CampaignHomePage() {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-                                 <img 
+                             <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
+                 <img 
                    src="/images/logo.png" 
                    alt="ME-IN Logo" 
                    className="w-6 h-6 object-contain"
+                   onError={(e) => {
+                     // 로고 로드 실패 시 텍스트로 대체
+                     const target = e.target as HTMLImageElement
+                     target.style.display = 'none'
+                     target.parentElement!.innerHTML = '<span class="text-white font-bold text-sm">M</span>'
+                   }}
                  />
-              </div>
+               </div>
             </div>
             
             {/* Notifications */}
@@ -142,13 +148,26 @@ export default function CampaignHomePage() {
           {filteredCampaigns.map(campaign => (
             <div key={campaign.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
               {/* Campaign Image */}
-              <div className="relative h-48 overflow-hidden">
-                                 <img 
+                             <div className="relative h-48 overflow-hidden">
+                 <img 
                    src={campaign.image}
                    alt={campaign.title}
                    className="w-full h-full object-cover"
+                   onError={(e) => {
+                     // 이미지 로드 실패 시 기본 이미지로 대체
+                     const target = e.target as HTMLImageElement
+                     target.src = `data:image/svg+xml;base64,${btoa(`
+                       <svg width="400" height="200" xmlns="http://www.w3.org/2000/svg">
+                         <rect width="400" height="200" fill="#f3f4f6"/>
+                         <text x="200" y="100" font-family="Arial, sans-serif" font-size="16" 
+                               text-anchor="middle" fill="#6b7280">
+                           ${campaign.title}
+                         </text>
+                       </svg>
+                     `)}`
+                   }}
                  />
-              </div>
+               </div>
               
               {/* Campaign Info */}
               <div className="p-4">

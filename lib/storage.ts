@@ -1,24 +1,15 @@
 import { supabase } from './supabase'
+import { ImageService } from './services/imageService'
 
+// 기존 함수들을 ImageService로 리다이렉트
 export const uploadImage = async (file: File, path: string) => {
   try {
-    const { error } = await supabase.storage
-      .from('campaign-images')
-      .upload(path, file, {
-        cacheControl: '3600',
-        upsert: false
-      })
-
-    if (error) {
-      throw error
+    const result = await ImageService.uploadCampaignImage('temp', file, path)
+    if (result.success && result.url) {
+      return result.url
+    } else {
+      throw new Error(result.error || '이미지 업로드에 실패했습니다.')
     }
-
-    // 공개 URL 반환
-    const { data: { publicUrl } } = supabase.storage
-      .from('campaign-images')
-      .getPublicUrl(path)
-
-    return publicUrl
   } catch (error) {
     console.error('Error uploading image:', error)
     throw error

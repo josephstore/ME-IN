@@ -139,30 +139,18 @@ export class ProfileService {
     }
   }
 
-  // 프로필 이미지 업로드
+  // 프로필 이미지 업로드 (ImageService 사용)
   static async uploadProfileImage(userId: string, file: File): Promise<string | null> {
     try {
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${userId}/profile.${fileExt}`
-
-      const { error } = await supabase.storage
-        .from('profile-images')
-        .upload(fileName, file, {
-          upsert: true,
-          cacheControl: '3600'
-        })
-
-      if (error) {
-        console.error('Error uploading profile image:', error)
+      const { ImageService } = await import('./imageService')
+      const result = await ImageService.uploadProfileImage(userId, file)
+      
+      if (result.success && result.url) {
+        return result.url
+      } else {
+        console.error('Error uploading profile image:', result.error)
         return null
       }
-
-      // 공개 URL 생성
-      const { data: urlData } = supabase.storage
-        .from('profile-images')
-        .getPublicUrl(fileName)
-
-      return urlData.publicUrl
     } catch (error) {
       console.error('Error in uploadProfileImage:', error)
       return null

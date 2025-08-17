@@ -71,14 +71,28 @@ export default function ProfilePage() {
     try {
       setUploading(true)
       const file = event.target.files[0]
-      const imageUrl = await ProfileService.uploadProfileImage(user.id, file)
+      
+      // 이미지 최적화 (선택사항)
+      const { ImageService } = await import('@/lib/services/imageService')
+      let optimizedFile = file
+      
+      try {
+        optimizedFile = await ImageService.optimizeImage(file, 800, 0.8)
+      } catch (error) {
+        console.warn('Image optimization failed, using original file:', error)
+      }
+      
+      const imageUrl = await ProfileService.uploadProfileImage(user.id, optimizedFile)
       
       if (imageUrl) {
         await ProfileService.updateProfile(user.id, { avatar_url: imageUrl })
         await loadProfile() // 프로필 다시 로드
+      } else {
+        alert('이미지 업로드에 실패했습니다. 다시 시도해주세요.')
       }
     } catch (error) {
       console.error('Error uploading image:', error)
+      alert('이미지 업로드 중 오류가 발생했습니다.')
     } finally {
       setUploading(false)
     }
@@ -207,19 +221,24 @@ export default function ProfilePage() {
         <div className="bg-white rounded-lg p-6 mb-6">
           <div className="flex items-center space-x-4">
             <div className="relative">
-              <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-200">
-                {profile.avatar_url ? (
-                  <img 
-                    src={profile.avatar_url} 
-                    alt="Profile" 
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400">
-                    <Camera className="w-8 h-8" />
-                  </div>
-                )}
-              </div>
+                             <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-200">
+                 {profile.avatar_url ? (
+                   <img 
+                     src={profile.avatar_url} 
+                     alt="Profile" 
+                     className="w-full h-full object-cover"
+                     onError={(e) => {
+                       // 이미지 로드 실패 시 기본 이미지로 대체
+                       const target = e.target as HTMLImageElement
+                       target.style.display = 'none'
+                       target.nextElementSibling?.classList.remove('hidden')
+                     }}
+                   />
+                 ) : null}
+                 <div className={`w-full h-full flex items-center justify-center text-gray-400 ${profile.avatar_url ? 'hidden' : ''}`}>
+                   <Camera className="w-8 h-8" />
+                 </div>
+               </div>
               {editing && (
                 <label className="absolute bottom-0 right-0 bg-orange-500 text-white p-1 rounded-full cursor-pointer hover:bg-orange-600 transition-colors">
                   <Camera className="w-4 h-4" />
