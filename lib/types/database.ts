@@ -1,372 +1,445 @@
-// Database Types for ME-IN Platform
-// Generated from Supabase schema
+// ME-IN 플랫폼 데이터베이스 타입 정의
 
-export interface Database {
-  public: {
-    Tables: {
-      profiles: {
-        Row: {
-          id: string
-          name: string | null
-          user_type: 'brand' | 'influencer' | null
-          language: string[] | null
-          timezone: string | null
-          avatar_url: string | null
-          bio: string | null
-          website: string | null
-          location: string | null
-          phone: string | null
-          social_links: Record<string, unknown> | null
-          preferences: Record<string, unknown> | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id: string
-          name?: string | null
-          user_type?: 'brand' | 'influencer' | null
-          language?: string[] | null
-          timezone?: string | null
-          avatar_url?: string | null
-          bio?: string | null
-          website?: string | null
-          location?: string | null
-          phone?: string | null
-          social_links?: Record<string, unknown> | null
-          preferences?: Record<string, unknown> | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          name?: string | null
-          user_type?: 'brand' | 'influencer' | null
-          language?: string[] | null
-          timezone?: string | null
-          avatar_url?: string | null
-          bio?: string | null
-          website?: string | null
-          location?: string | null
-          phone?: string | null
-          social_links?: Record<string, unknown> | null
-          preferences?: Record<string, unknown> | null
-          created_at?: string
-          updated_at?: string
-        }
-      }
-      brand_profiles: {
-        Row: {
-          id: string
-          company_name: string
-          industry: string | null
-          company_size: 'startup' | 'small' | 'medium' | 'large' | null
-          target_regions: string[] | null
-          target_languages: string[] | null
-          budget_range: 'low' | 'medium' | 'high' | 'premium' | null
-          website: string | null
-          founded_year: number | null
-          description: string | null
-          logo_url: string | null
-          verification_status: 'pending' | 'verified' | 'rejected'
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id: string
-          company_name: string
-          industry?: string | null
-          company_size?: 'startup' | 'small' | 'medium' | 'large' | null
-          target_regions?: string[] | null
-          target_languages?: string[] | null
-          budget_range?: 'low' | 'medium' | 'high' | 'premium' | null
-          website?: string | null
-          founded_year?: number | null
-          description?: string | null
-          logo_url?: string | null
-          verification_status?: 'pending' | 'verified' | 'rejected'
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          company_name?: string
-          industry?: string | null
-          company_size?: 'startup' | 'small' | 'medium' | 'large' | null
-          target_regions?: string[] | null
-          target_languages?: string[] | null
-          budget_range?: 'low' | 'medium' | 'high' | 'premium' | null
-          website?: string | null
-          founded_year?: number | null
-          description?: string | null
-          logo_url?: string | null
-          verification_status?: 'pending' | 'verified' | 'rejected'
-          created_at?: string
-          updated_at?: string
-        }
-      }
-      influencer_profiles: {
-        Row: {
-          id: string
-          display_name: string
-          content_categories: string[] | null
-          platforms: Record<string, unknown> | null
-          total_followers: number
-          engagement_rate: number | null
-          languages: string[] | null
-          content_languages: string[] | null
-          collaboration_history: Record<string, unknown>[] | null
-          portfolio_url: string | null
-          verification_status: 'pending' | 'verified' | 'rejected'
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id: string
-          display_name: string
-          content_categories?: string[] | null
-          platforms?: Record<string, unknown> | null
-          total_followers?: number
-          engagement_rate?: number | null
-          languages?: string[] | null
-          content_languages?: string[] | null
-          collaboration_history?: Record<string, unknown>[] | null
-          portfolio_url?: string | null
-          verification_status?: 'pending' | 'verified' | 'rejected'
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          display_name?: string
-          content_categories?: string[] | null
-          platforms?: Record<string, unknown> | null
-          total_followers?: number
-          engagement_rate?: number | null
-          languages?: string[] | null
-          content_languages?: string[] | null
-          collaboration_history?: Record<string, unknown>[] | null
-          portfolio_url?: string | null
-          verification_status?: 'pending' | 'verified' | 'rejected'
-          created_at?: string
-          updated_at?: string
-        }
-      }
-      campaigns: {
-        Row: {
-          id: string
-          brand_id: string
-          title: string
-          title_kr: string | null
-          description: string
-          description_kr: string | null
-          category: string
-          budget_min: number
-          budget_max: number
-          currency: string
-          target_regions: string[] | null
-          target_languages: string[] | null
-          requirements: Record<string, unknown> | null
-          media_assets: Record<string, unknown>[] | null
-          status: 'draft' | 'active' | 'paused' | 'completed' | 'cancelled'
-          start_date: string | null
-          end_date: string | null
-          application_deadline: string | null
-          max_applications: number | null
-          current_applications: number
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          brand_id: string
-          title: string
-          title_kr?: string | null
-          description: string
-          description_kr?: string | null
-          category: string
-          budget_min: number
-          budget_max: number
-          currency?: string
-          target_regions?: string[] | null
-          target_languages?: string[] | null
-          requirements?: Record<string, unknown> | null
-          media_assets?: Record<string, unknown>[] | null
-          status?: 'draft' | 'active' | 'paused' | 'completed' | 'cancelled'
-          start_date?: string | null
-          end_date?: string | null
-          application_deadline?: string | null
-          max_applications?: number | null
-          current_applications?: number
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          brand_id?: string
-          title?: string
-          title_kr?: string | null
-          description?: string
-          description_kr?: string | null
-          category?: string
-          budget_min?: number
-          budget_max?: number
-          currency?: string
-          target_regions?: string[] | null
-          target_languages?: string[] | null
-          requirements?: Record<string, unknown> | null
-          media_assets?: Record<string, unknown>[] | null
-          status?: 'draft' | 'active' | 'paused' | 'completed' | 'cancelled'
-          start_date?: string | null
-          end_date?: string | null
-          application_deadline?: string | null
-          max_applications?: number | null
-          current_applications?: number
-          created_at?: string
-          updated_at?: string
-        }
-      }
-      applications: {
-        Row: {
-          id: string
-          campaign_id: string
-          influencer_id: string
-          status: 'pending' | 'approved' | 'rejected' | 'withdrawn'
-          proposal: string | null
-          portfolio_links: Record<string, unknown>[] | null
-          proposed_budget: number | null
-          timeline_days: number | null
-          message: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          campaign_id: string
-          influencer_id: string
-          status?: 'pending' | 'approved' | 'rejected' | 'withdrawn'
-          proposal?: string | null
-          portfolio_links?: Record<string, unknown>[] | null
-          proposed_budget?: number | null
-          timeline_days?: number | null
-          message?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          campaign_id?: string
-          influencer_id?: string
-          status?: 'pending' | 'approved' | 'rejected' | 'withdrawn'
-          proposal?: string | null
-          portfolio_links?: Record<string, unknown>[] | null
-          proposed_budget?: number | null
-          timeline_days?: number | null
-          message?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-      }
-      messages: {
-        Row: {
-          id: string
-          sender_id: string
-          receiver_id: string
-          campaign_id: string | null
-          content: string
-          message_type: 'text' | 'image' | 'file' | 'system'
-          file_url: string | null
-          is_read: boolean
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          sender_id: string
-          receiver_id: string
-          campaign_id?: string | null
-          content: string
-          message_type?: 'text' | 'image' | 'file' | 'system'
-          file_url?: string | null
-          is_read?: boolean
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          sender_id?: string
-          receiver_id?: string
-          campaign_id?: string | null
-          content?: string
-          message_type?: 'text' | 'image' | 'file' | 'system'
-          file_url?: string | null
-          is_read?: boolean
-          created_at?: string
-        }
-      }
-      notifications: {
-        Row: {
-          id: string
-          user_id: string
-          type: 'campaign' | 'application' | 'message' | 'system'
-          title: string
-          message: string
-          data: Record<string, unknown> | null
-          is_read: boolean
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          type: 'campaign' | 'application' | 'message' | 'system'
-          title: string
-          message: string
-          data?: Record<string, unknown> | null
-          is_read?: boolean
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          type?: 'campaign' | 'application' | 'message' | 'system'
-          title?: string
-          message?: string
-          data?: Record<string, unknown> | null
-          is_read?: boolean
-          created_at?: string
-        }
-      }
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      [_ in never]: never
-    }
-    Enums: {
-      [_ in never]: never
-    }
+export interface UserProfile {
+  id: string
+  user_id: string
+  user_type: 'brand' | 'influencer'
+  display_name?: string
+  bio?: string
+  avatar_url?: string
+  phone?: string
+  website?: string
+  languages: string[]
+  timezone: string
+  location?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface BrandProfile {
+  id: string
+  user_profile_id: string
+  company_name: string
+  company_name_en?: string
+  company_name_ar?: string
+  business_number?: string
+  industry?: string
+  company_size?: string
+  target_markets: string[]
+  budget_min?: number
+  budget_max?: number
+  currency: string
+  logo_url?: string
+  company_description?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface InfluencerProfile {
+  id: string
+  user_profile_id: string
+  total_followers: number
+  avg_engagement_rate: number
+  content_categories: string[]
+  collaboration_history: string
+  rating: number
+  hourly_rate?: number
+  currency: string
+  portfolio_url?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface SocialAccount {
+  id: string
+  influencer_profile_id: string
+  platform: string
+  username: string
+  followers: number
+  avg_views: number
+  avg_likes: number
+  avg_comments: number
+  profile_url?: string
+  is_verified: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface Campaign {
+  id: string
+  brand_profile_id: string
+  title: string
+  title_en?: string
+  title_ar?: string
+  description?: string
+  description_en?: string
+  description_ar?: string
+  category?: string
+  budget_min: number
+  budget_max: number
+  currency: string
+  target_languages: string[]
+  target_regions: string[]
+  min_followers: number
+  content_requirements?: string
+  start_date?: string
+  end_date?: string
+  application_deadline?: string
+  max_applications?: number
+  status: 'draft' | 'active' | 'paused' | 'completed' | 'cancelled'
+  media_assets: string[]
+  created_at: string
+  updated_at: string
+  brand_profiles?: BrandProfile & {
+    user_profiles?: UserProfile
   }
 }
 
-// Convenience types
-export type Profile = Database['public']['Tables']['profiles']['Row']
-export type BrandProfile = Database['public']['Tables']['brand_profiles']['Row']
-export type InfluencerProfile = Database['public']['Tables']['influencer_profiles']['Row']
-export type Campaign = Database['public']['Tables']['campaigns']['Row']
-export type Application = Database['public']['Tables']['applications']['Row']
-export type Message = Database['public']['Tables']['messages']['Row']
-export type Notification = Database['public']['Tables']['notifications']['Row']
-
-// Extended types with relationships
-export interface ProfileWithDetails extends Profile {
-  brand_profile?: BrandProfile | null
-  influencer_profile?: InfluencerProfile | null
+export interface Application {
+  id: string
+  campaign_id: string
+  influencer_profile_id: string
+  proposal?: string
+  proposed_budget?: number
+  proposed_timeline?: string
+  portfolio_links: string[]
+  status: 'pending' | 'reviewed' | 'approved' | 'rejected' | 'withdrawn'
+  brand_feedback?: string
+  created_at: string
+  updated_at: string
+  campaigns?: Campaign
+  influencer_profiles?: InfluencerProfile & {
+    user_profiles?: UserProfile
+  }
 }
 
-export interface CampaignWithDetails extends Campaign {
-  brand_profile?: BrandProfile | null
-  applications_count?: number
+export interface Message {
+  id: string
+  sender_id: string
+  receiver_id: string
+  application_id?: string
+  content: string
+  message_type: 'text' | 'file' | 'image'
+  file_url?: string
+  is_read: boolean
+  created_at: string
 }
 
-export interface ApplicationWithDetails extends Application {
-  campaign?: Campaign | null
-  influencer_profile?: InfluencerProfile | null
+export interface Notification {
+  id: string
+  user_id: string
+  title: string
+  message: string
+  type: string
+  reference_id?: string
+  reference_type?: string
+  is_read: boolean
+  created_at: string
+}
+
+// API 응답 타입
+export interface ApiResponse<T> {
+  data: T | null
+  error: string | null
+  success: boolean
+}
+
+// 프로필 생성/수정 타입
+export interface CreateUserProfileRequest {
+  user_id: string
+  user_type: 'brand' | 'influencer'
+  display_name?: string
+  bio?: string
+  avatar_url?: string
+  phone?: string
+  website?: string
+  languages?: string[]
+  timezone?: string
+  location?: string
+}
+
+export interface CreateBrandProfileRequest {
+  company_name: string
+  company_name_en?: string
+  company_name_ar?: string
+  business_number?: string
+  industry?: string
+  company_size?: string
+  target_markets?: string[]
+  budget_min?: number
+  budget_max?: number
+  currency?: string
+  logo_url?: string
+  company_description?: string
+}
+
+export interface CreateInfluencerProfileRequest {
+  user_profile_id: string
+  content_categories?: string[]
+  target_audience?: string
+  collaboration_history?: string
+  preferred_brands?: string[]
+  availability?: string
+  rate_card?: Record<string, any>
+  total_followers?: number
+  avg_engagement_rate?: number
+  rating?: number
+  hourly_rate?: number
+  currency?: string
+  portfolio_url?: string
+}
+
+// 소셜 계정 타입
+export interface CreateSocialAccountRequest {
+  user_profile_id: string
+  platform: string
+  username: string
+  followers?: number
+  engagement_rate?: number
+  avg_views?: number
+  avg_likes?: number
+  avg_comments?: number
+  url?: string
+  is_verified?: boolean
+}
+
+// 캠페인 타입
+export interface CreateCampaignRequest {
+  title: string
+  title_en?: string
+  title_ar?: string
+  description?: string
+  description_en?: string
+  description_ar?: string
+  category?: string
+  budget_min: number
+  budget_max: number
+  currency?: string
+  target_languages?: string[]
+  target_regions?: string[]
+  min_followers?: number
+  content_requirements?: string
+  start_date?: string
+  end_date?: string
+  application_deadline?: string
+  max_applications?: number
+  media_assets?: string[]
+}
+
+// 신청 타입
+export interface CreateApplicationRequest {
+  campaign_id: string
+  proposal?: string
+  proposed_budget?: number
+  proposed_timeline?: string
+  portfolio_links?: string[]
+}
+
+// 메시지 타입
+export interface CreateMessageRequest {
+  receiver_id: string
+  application_id?: string
+  content: string
+  message_type?: 'text' | 'file' | 'image'
+  file_url?: string
+}
+
+// 알림 타입
+export interface CreateNotificationRequest {
+  user_id: string
+  title: string
+  message: string
+  type: string
+  reference_id?: string
+  reference_type?: string
+}
+
+export interface CampaignTemplate {
+  id: string
+  name: string
+  name_en?: string
+  name_ar?: string
+  description?: string
+  description_en?: string
+  description_ar?: string
+  category: string
+  template_data: {
+    title_template: string
+    title_template_en?: string
+    title_template_ar?: string
+    description_template: string
+    description_template_en?: string
+    description_template_ar?: string
+    budget_min: number
+    budget_max: number
+    target_languages: string[]
+    target_regions: string[]
+    min_followers: number
+    content_requirements_template: string
+    content_requirements_template_en?: string
+    content_requirements_template_ar?: string
+    media_requirements: string[]
+    duration_days: number
+  }
+  is_public: boolean
+  created_by: string
+  usage_count: number
+  created_at: string
+  updated_at: string
+}
+
+export interface CreateCampaignTemplateRequest {
+  name: string
+  name_en?: string
+  name_ar?: string
+  description?: string
+  description_en?: string
+  description_ar?: string
+  category: string
+  template_data: {
+    title_template: string
+    title_template_en?: string
+    title_template_ar?: string
+    description_template: string
+    description_template_en?: string
+    description_template_ar?: string
+    budget_min: number
+    budget_max: number
+    target_languages: string[]
+    target_regions: string[]
+    min_followers: number
+    content_requirements_template: string
+    content_requirements_template_en?: string
+    content_requirements_template_ar?: string
+    media_requirements: string[]
+    duration_days: number
+  }
+  is_public?: boolean
+}
+
+export interface UpdateCampaignTemplateRequest {
+  name?: string
+  name_en?: string
+  name_ar?: string
+  description?: string
+  description_en?: string
+  description_ar?: string
+  category?: string
+  template_data?: Partial<CampaignTemplate['template_data']>
+  is_public?: boolean
+}
+
+export interface Portfolio {
+  id: string
+  influencer_profile_id: string
+  title: string
+  title_en?: string
+  title_ar?: string
+  description?: string
+  description_en?: string
+  description_ar?: string
+  category: string
+  media_urls?: string[]
+  external_links?: Record<string, any>
+  tags?: string[]
+  is_public: boolean
+  featured: boolean
+  view_count: number
+  like_count: number
+  created_at: string
+  updated_at: string
+  influencer_profiles?: InfluencerProfile & { user_profiles?: UserProfile }
+  portfolio_media?: PortfolioMedia[]
+  portfolio_comments?: PortfolioComment[]
+  portfolio_likes?: PortfolioLike[]
+}
+
+export interface PortfolioMedia {
+  id: string
+  portfolio_id: string
+  media_type: 'image' | 'video' | 'document'
+  media_url: string
+  thumbnail_url?: string
+  title?: string
+  description?: string
+  file_size?: number
+  duration?: number
+  order_index: number
+  created_at: string
+}
+
+export interface PortfolioComment {
+  id: string
+  portfolio_id: string
+  user_id: string
+  content: string
+  parent_id?: string
+  is_public: boolean
+  created_at: string
+  updated_at: string
+  user_profiles?: UserProfile
+  replies?: PortfolioComment[]
+}
+
+export interface PortfolioLike {
+  id: string
+  portfolio_id: string
+  user_id: string
+  created_at: string
+  user_profiles?: UserProfile
+}
+
+export interface CreatePortfolioRequest {
+  influencer_profile_id: string
+  title: string
+  title_en?: string
+  title_ar?: string
+  description?: string
+  description_en?: string
+  description_ar?: string
+  category: string
+  media_urls?: string[]
+  external_links?: Record<string, any>
+  tags?: string[]
+  is_public?: boolean
+  featured?: boolean
+}
+
+export interface UpdatePortfolioRequest {
+  title?: string
+  title_en?: string
+  title_ar?: string
+  description?: string
+  description_en?: string
+  description_ar?: string
+  category?: string
+  media_urls?: string[]
+  external_links?: Record<string, any>
+  tags?: string[]
+  is_public?: boolean
+  featured?: boolean
+}
+
+export interface CreatePortfolioMediaRequest {
+  portfolio_id: string
+  media_type: 'image' | 'video' | 'document'
+  media_url: string
+  thumbnail_url?: string
+  title?: string
+  description?: string
+  file_size?: number
+  duration?: number
+  order_index?: number
+}
+
+export interface CreatePortfolioCommentRequest {
+  portfolio_id: string
+  content: string
+  parent_id?: string
+  is_public?: boolean
+}
+
+export interface UpdatePortfolioCommentRequest {
+  content: string
+  is_public?: boolean
 }

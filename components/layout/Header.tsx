@@ -19,6 +19,9 @@ const Header = () => {
     { name: t('nav.home'), href: '/' },
     { name: 'Dashboard', href: user?.user_metadata?.user_type === 'brand' ? '/dashboard/brands' : '/dashboard/influencers' },
     { name: t('nav.campaigns'), href: '/campaigns' },
+    { name: '템플릿', href: '/templates' },
+    { name: '포트폴리오', href: '/portfolios' },
+    { name: '분석', href: '/analytics' },
     { name: t('nav.about'), href: '/about' },
     { name: t('nav.contact'), href: '/contact' },
   ] : [
