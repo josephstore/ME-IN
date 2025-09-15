@@ -432,17 +432,38 @@ export class CampaignService {
 
   // 캠페인 생성
   static async createCampaign(brandId: string, campaignData: any) {
-    const { data, error } = await supabase
-      .from('campaigns')
-      .insert({
-        brand_id: brandId,
-        ...campaignData
-      })
-      .select()
-      .single()
+    try {
+      const { data, error } = await supabase
+        .from('campaigns')
+        .insert({
+          brand_id: brandId,
+          ...campaignData
+        })
+        .select()
+        .single()
 
-    if (error) throw error
-    return data
+      if (error) {
+        console.error('캠페인 생성 오류:', error)
+        return {
+          success: false,
+          error: error.message,
+          data: null
+        }
+      }
+
+      return {
+        success: true,
+        data: data,
+        error: null
+      }
+    } catch (error) {
+      console.error('캠페인 생성 중 예외 발생:', error)
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.',
+        data: null
+      }
+    }
   }
 
   // 캠페인 업데이트

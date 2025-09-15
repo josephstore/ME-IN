@@ -121,30 +121,52 @@ export default function CreateCampaignPage() {
         return
       }
 
-      // 파일 업로드 처리
+      // Supabase 연결 확인
+      try {
+        const { data: testData, error: testError } = await supabase
+          .from('campaigns')
+          .select('id')
+          .limit(1)
+        
+        if (testError) {
+          console.error('Supabase 연결 오류:', testError)
+          alert('데이터베이스 연결에 문제가 있습니다. 잠시 후 다시 시도해주세요.')
+          return
+        }
+      } catch (connectionError) {
+        console.error('Supabase 연결 테스트 실패:', connectionError)
+        alert('데이터베이스 연결에 문제가 있습니다. 잠시 후 다시 시도해주세요.')
+        return
+      }
+
+      // 파일 업로드 처리 (선택사항)
       const uploadedUrls: string[] = []
-      for (const file of tempData.media_files) {
-        try {
-          const fileExt = file.name.split('.').pop()
-          const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
-          const filePath = `campaigns/${fileName}`
+      if (tempData.media_files.length > 0) {
+        for (const file of tempData.media_files) {
+          try {
+            const fileExt = file.name.split('.').pop()
+            const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
+            const filePath = `campaigns/${fileName}`
 
-          const { data: uploadData, error: uploadError } = await supabase.storage
-            .from('campaign-images')
-            .upload(filePath, file)
+            const { data: uploadData, error: uploadError } = await supabase.storage
+              .from('campaign-images')
+              .upload(filePath, file)
 
-          if (uploadError) {
-            console.error('파일 업로드 오류:', uploadError)
-            continue
+            if (uploadError) {
+              console.error('파일 업로드 오류:', uploadError)
+              // 파일 업로드 실패해도 캠페인 생성은 계속 진행
+              continue
+            }
+
+            const { data: { publicUrl } } = supabase.storage
+              .from('campaign-images')
+              .getPublicUrl(filePath)
+
+            uploadedUrls.push(publicUrl)
+          } catch (error) {
+            console.error('파일 업로드 중 오류:', error)
+            // 파일 업로드 실패해도 캠페인 생성은 계속 진행
           }
-
-          const { data: { publicUrl } } = supabase.storage
-            .from('campaign-images')
-            .getPublicUrl(filePath)
-
-          uploadedUrls.push(publicUrl)
-        } catch (error) {
-          console.error('파일 업로드 중 오류:', error)
         }
       }
 
@@ -155,16 +177,17 @@ export default function CreateCampaignPage() {
 
       const response = await CampaignService.createCampaign('demo-user', campaignData)
       
-      if (response.success && response.data) {
+      if (response && response.success && response.data) {
         alert('캠페인이 성공적으로 생성되었습니다!')
         router.push(`/campaigns/${response.data.id}`)
       } else {
-        alert(`캠페인 생성 실패: ${response.error}`)
+        const errorMessage = response?.error || '알 수 없는 오류가 발생했습니다.'
+        alert(`캠페인 생성 실패: ${errorMessage}`)
       }
       
     } catch (error) {
       console.error('캠페인 생성 오류:', error)
-      alert('캠페인 생성 중 오류가 발생했습니다.')
+      alert('캠페인 생성 중 오류가 발생했습니다. 네트워크 연결을 확인해주세요.')
     } finally {
       setSaving(false)
     }
