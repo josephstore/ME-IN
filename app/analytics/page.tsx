@@ -91,11 +91,7 @@ export default function AnalyticsPage() {
   const loadAnalytics = async () => {
     try {
       setLoading(true)
-      const response = await AnalyticsService.getAnalytics({
-        period: selectedPeriod,
-        user_id: 'demo',
-        user_type: 'brand'
-      })
+      const response = await AnalyticsService.getDashboardStats('demo', 'brand')
       
       if (response.success && response.data) {
         setAnalytics(response.data)

@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
-import { PortfolioService } from '../../../lib/services/portfolioService'
-import { ProfileService } from '../../../lib/services/profileService'
+import { PortfolioService } from '@/lib/services/databaseService'
+import { ProfileService } from '@/lib/services/databaseService'
 import { CreatePortfolioRequest, UserProfile, InfluencerProfile } from '../../../lib/types/database'
 import { 
   ArrowLeft, Save, Upload, X, Plus, Camera, Video, FileText, 

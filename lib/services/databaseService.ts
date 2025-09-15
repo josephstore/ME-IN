@@ -881,6 +881,75 @@ export class SystemService {
   }
 }
 
+// =============================================
+// 9. 포트폴리오 관리 서비스
+// =============================================
+
+export class PortfolioService {
+  // 포트폴리오 목록 조회
+  static async getPortfolios(userId: string) {
+    const { data, error } = await supabase
+      .from('portfolios')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    return data
+  }
+
+  // 포트폴리오 상세 조회
+  static async getPortfolio(portfolioId: string) {
+    const { data, error } = await supabase
+      .from('portfolios')
+      .select('*')
+      .eq('id', portfolioId)
+      .single()
+
+    if (error) throw error
+    return data
+  }
+
+  // 포트폴리오 생성
+  static async createPortfolio(portfolioData: any) {
+    const { data, error } = await supabase
+      .from('portfolios')
+      .insert(portfolioData)
+      .select()
+      .single()
+
+    if (error) throw error
+    return data
+  }
+
+  // 포트폴리오 업데이트
+  static async updatePortfolio(portfolioId: string, updates: any) {
+    const { data, error } = await supabase
+      .from('portfolios')
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', portfolioId)
+      .select()
+      .single()
+
+    if (error) throw error
+    return data
+  }
+
+  // 포트폴리오 삭제
+  static async deletePortfolio(portfolioId: string) {
+    const { error } = await supabase
+      .from('portfolios')
+      .delete()
+      .eq('id', portfolioId)
+
+    if (error) throw error
+    return { success: true }
+  }
+}
+
 export default {
   UserService,
   BrandService,
@@ -890,5 +959,6 @@ export default {
   MessagingService,
   NotificationService,
   AnalyticsService,
-  SystemService
+  SystemService,
+  PortfolioService
 }
