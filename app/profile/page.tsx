@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Settings, Edit, Bell, Shield, HelpCircle, LogOut, User, Mail, Phone, MapPin, Calendar, Award, Star, Globe } from 'lucide-react'
+import { Settings, Edit, Bell, Shield, HelpCircle, LogOut, User, Mail, Phone, MapPin, Calendar, Award, Star, Globe, Heart } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import BottomNavigation from '@/components/layout/BottomNavigation'
