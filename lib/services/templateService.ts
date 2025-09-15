@@ -1,10 +1,5 @@
-import { createClient } from '@supabase/supabase-js'
+import { supabase } from '@/lib/supabase'
 import { CampaignTemplate, CreateCampaignTemplateRequest, UpdateCampaignTemplateRequest } from '../types/database'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
 
 export class TemplateService {
   // 템플릿 생성

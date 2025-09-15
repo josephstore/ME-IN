@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+import { supabase } from '@/lib/supabase'
 import { 
   Portfolio, 
   PortfolioMedia, 
@@ -11,11 +11,6 @@ import {
   UpdatePortfolioCommentRequest,
   ApiResponse 
 } from '../types/database'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
 
 export class PortfolioService {
   // 포트폴리오 CRUD

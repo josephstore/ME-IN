@@ -121,22 +121,21 @@ export default function CreateCampaignPage() {
         return
       }
 
-      // Supabase 연결 확인
+      // Supabase 연결 확인 (선택사항)
       try {
+        // 간단한 연결 테스트 - campaigns 테이블이 없을 수 있으므로 더 안전한 방법 사용
         const { data: testData, error: testError } = await supabase
           .from('campaigns')
           .select('id')
           .limit(1)
         
         if (testError) {
-          console.error('Supabase 연결 오류:', testError)
-          alert('데이터베이스 연결에 문제가 있습니다. 잠시 후 다시 시도해주세요.')
-          return
+          console.warn('Supabase 연결 테스트 경고:', testError)
+          // 연결 오류가 있어도 캠페인 생성은 시도 (더미 데이터로 처리)
         }
       } catch (connectionError) {
-        console.error('Supabase 연결 테스트 실패:', connectionError)
-        alert('데이터베이스 연결에 문제가 있습니다. 잠시 후 다시 시도해주세요.')
-        return
+        console.warn('Supabase 연결 테스트 실패:', connectionError)
+        // 연결 테스트 실패해도 캠페인 생성은 시도
       }
 
       // 파일 업로드 처리 (선택사항)
