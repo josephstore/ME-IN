@@ -81,16 +81,6 @@ export default function Navigation() {
           <div className="hidden md:flex items-center space-x-4">
             {isAuthenticated ? (
               <>
-                {/* 캠페인 생성 버튼 */}
-                <Button
-                  onClick={() => router.push('/campaigns/create')}
-                  className="bg-orange-600 hover:bg-orange-700 text-white"
-                  size="sm"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  캠페인 생성
-                </Button>
-
                 {/* 사용자 프로필 */}
                 <div className="flex items-center space-x-3">
                   <div className="flex items-center space-x-2">
@@ -186,17 +176,6 @@ export default function Navigation() {
                       <div className="text-sm text-gray-500 capitalize">{user?.user_type}</div>
                     </div>
                   </div>
-                  <Button
-                    onClick={() => {
-                      router.push('/campaigns/create')
-                      setIsMobileMenuOpen(false)
-                    }}
-                    className="w-full bg-orange-600 hover:bg-orange-700 text-white"
-                    size="sm"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    캠페인 생성
-                  </Button>
                   <Button
                     onClick={handleLogout}
                     variant="outline"

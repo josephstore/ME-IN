@@ -208,24 +208,15 @@ export default function CampaignsPage() {
                 브랜드와 인플루언서를 연결하는 다양한 캠페인을 만나보세요
               </p>
             </div>
-            <div className="flex items-center space-x-3">
-              <Button
-                onClick={loadCampaigns}
-                variant="outline"
-                disabled={loading}
-                className="text-gray-600 hover:text-gray-900"
-              >
-                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-                새로고침
-              </Button>
-              <Button
-                onClick={() => router.push('/campaigns/create')}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                캠페인 생성
-              </Button>
-            </div>
+            <Button
+              onClick={loadCampaigns}
+              variant="outline"
+              disabled={loading}
+              className="text-gray-600 hover:text-gray-900"
+            >
+              <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+              새로고침
+            </Button>
           </div>
         </div>
 
@@ -411,6 +402,17 @@ export default function CampaignsPage() {
             </Button>
           </div>
         )}
+
+        {/* 플로팅 액션 버튼 - 캠페인 생성 */}
+        <div className="fixed bottom-6 right-6 z-50">
+          <Button
+            onClick={() => router.push('/campaigns/create')}
+            className="bg-orange-600 hover:bg-orange-700 text-white rounded-full w-14 h-14 shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center"
+            title="새 캠페인 생성"
+          >
+            <Plus className="w-6 h-6" />
+          </Button>
+        </div>
       </div>
     </div>
   )
