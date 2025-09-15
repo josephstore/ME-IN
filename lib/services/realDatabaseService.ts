@@ -121,8 +121,8 @@ export class RealCampaignService {
           id, brand_id, title, title_en, title_ar, description, description_en, description_ar,
           category, budget_min, budget_max, currency, target_languages, target_regions,
           min_followers, content_requirements, start_date, end_date, application_deadline,
-          max_applications, media_assets
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          max_applications, media_assets, status
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `)
       
       stmt.run(
@@ -146,7 +146,8 @@ export class RealCampaignService {
         campaignData.end_date || null,
         campaignData.application_deadline || null,
         campaignData.max_applications || null,
-        JSON.stringify(campaignData.media_assets || [])
+        JSON.stringify(campaignData.media_assets || []),
+        'active' // 새로 생성된 캠페인은 active 상태로 설정
       )
       
       return {
@@ -171,7 +172,7 @@ export class RealCampaignService {
         SELECT c.*, u.name as brand_name, u.email as brand_email
         FROM campaigns c
         JOIN users u ON c.brand_id = u.id
-        WHERE c.status = 'active'
+        WHERE c.status IN ('active', 'pending', 'draft')
         ORDER BY c.created_at DESC
       `)
       

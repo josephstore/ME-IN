@@ -152,7 +152,7 @@ export default function CreateCampaignPage() {
       if (response && response.success && response.data) {
         alert('캠페인이 성공적으로 생성되었습니다!')
         // 캠페인 목록 페이지로 이동하여 생성된 캠페인 확인 가능
-        router.push('/campaigns')
+        router.push('/campaigns?refresh=true')
       } else {
         const errorMessage = response?.error || '알 수 없는 오류가 발생했습니다.'
         alert(`캠페인 생성 실패: ${errorMessage}`)

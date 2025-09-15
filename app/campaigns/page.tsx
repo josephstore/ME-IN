@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { RealCampaignService } from '@/lib/services/realDatabaseService'
 import { Campaign } from '@/lib/types/database'
 import { Button } from '@/components/ui/Button'
@@ -17,11 +17,13 @@ import {
   Star,
   Eye,
   MapPin,
-  Clock
+  Clock,
+  RefreshCw
 } from 'lucide-react'
 
 export default function CampaignsPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [loading, setLoading] = useState(true)
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
   const [filteredCampaigns, setFilteredCampaigns] = useState<Campaign[]>([])
@@ -53,6 +55,24 @@ export default function CampaignsPage() {
 
   useEffect(() => {
     loadCampaigns()
+    
+    // URL에 refresh 파라미터가 있으면 데이터 새로고침
+    if (searchParams.get('refresh') === 'true') {
+      // URL에서 refresh 파라미터 제거
+      const newUrl = new URL(window.location.href)
+      newUrl.searchParams.delete('refresh')
+      window.history.replaceState({}, '', newUrl.toString())
+    }
+  }, [searchParams])
+
+  // 페이지 포커스 시 데이터 새로고침
+  useEffect(() => {
+    const handleFocus = () => {
+      loadCampaigns()
+    }
+    
+    window.addEventListener('focus', handleFocus)
+    return () => window.removeEventListener('focus', handleFocus)
   }, [])
 
   useEffect(() => {
@@ -188,13 +208,24 @@ export default function CampaignsPage() {
                 브랜드와 인플루언서를 연결하는 다양한 캠페인을 만나보세요
               </p>
             </div>
-            <Button
-              onClick={() => router.push('/campaigns/create')}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              캠페인 생성
-            </Button>
+            <div className="flex items-center space-x-3">
+              <Button
+                onClick={loadCampaigns}
+                variant="outline"
+                disabled={loading}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                새로고침
+              </Button>
+              <Button
+                onClick={() => router.push('/campaigns/create')}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                캠페인 생성
+              </Button>
+            </div>
           </div>
         </div>
 
