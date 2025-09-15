@@ -118,19 +118,20 @@ export const simpleAuth: SimpleAuth = {
   // 로그인
   login: async (email: string, password: string) => {
     try {
-      const users = getStoredUsers()
-      const user = users.find(u => u.email === email && u.password === simpleHash(password))
+      // 실제 데이터베이스에서 사용자 확인
+      const { RealUserService } = await import('@/lib/services/realDatabaseService')
+      const result = await RealUserService.loginUser(email, password)
       
-      if (!user) {
-        return { success: false, error: '이메일 또는 비밀번호가 올바르지 않습니다.' }
+      if (!result.success || !result.data) {
+        return { success: false, error: result.error || '로그인에 실패했습니다.' }
       }
 
       const authUser: SimpleUser = {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        user_type: user.user_type,
-        created_at: user.created_at
+        id: result.data.id,
+        email: result.data.email,
+        name: result.data.name,
+        user_type: result.data.user_type,
+        created_at: result.data.created_at
       }
 
       saveCurrentAuth(authUser)
@@ -139,6 +140,7 @@ export const simpleAuth: SimpleAuth = {
 
       return { success: true }
     } catch (error) {
+      console.error('로그인 오류:', error)
       return { success: false, error: '로그인 중 오류가 발생했습니다.' }
     }
   },
@@ -146,34 +148,21 @@ export const simpleAuth: SimpleAuth = {
   // 회원가입
   register: async (email: string, password: string, name: string, user_type: 'brand' | 'influencer') => {
     try {
-      const users = getStoredUsers()
+      // 실제 데이터베이스에 사용자 생성
+      const { RealUserService } = await import('@/lib/services/realDatabaseService')
+      const result = await RealUserService.createUser(email, password, name, user_type)
       
-      // 이메일 중복 확인
-      if (users.find(u => u.email === email)) {
-        return { success: false, error: '이미 사용 중인 이메일입니다.' }
+      if (!result.success || !result.data) {
+        return { success: false, error: result.error || '회원가입에 실패했습니다.' }
       }
-
-      // 새 사용자 생성
-      const newUser: StoredUser = {
-        id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        email,
-        password: simpleHash(password),
-        name,
-        user_type,
-        created_at: new Date().toISOString()
-      }
-
-      // 사용자 저장
-      users.push(newUser)
-      saveStoredUsers(users)
 
       // 자동 로그인
       const authUser: SimpleUser = {
-        id: newUser.id,
-        email: newUser.email,
-        name: newUser.name,
-        user_type: newUser.user_type,
-        created_at: newUser.created_at
+        id: result.data.id,
+        email: result.data.email,
+        name: result.data.name,
+        user_type: result.data.user_type,
+        created_at: new Date().toISOString()
       }
 
       saveCurrentAuth(authUser)
@@ -182,6 +171,7 @@ export const simpleAuth: SimpleAuth = {
 
       return { success: true }
     } catch (error) {
+      console.error('회원가입 오류:', error)
       return { success: false, error: '회원가입 중 오류가 발생했습니다.' }
     }
   },

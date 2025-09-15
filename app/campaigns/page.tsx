@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { CampaignService } from '@/lib/services/databaseService'
+import { RealCampaignService } from '@/lib/services/realDatabaseService'
 import { Campaign } from '@/lib/types/database'
 import { Button } from '@/components/ui/Button'
 import { 
@@ -62,13 +62,10 @@ export default function CampaignsPage() {
   const loadCampaigns = async () => {
     try {
       setLoading(true)
-      const response = await CampaignService.getCampaigns({
-        limit: 50,
-        offset: 0
-      })
+      const response = await RealCampaignService.getCampaigns()
       
-      if (response && Array.isArray(response)) {
-        setCampaigns(response)
+      if (response && response.success && response.data) {
+        setCampaigns(response.data)
       }
     } catch (error) {
       console.error('캠페인 로드 오류:', error)

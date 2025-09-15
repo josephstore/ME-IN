@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { InfluencerService } from '@/lib/services/databaseService'
+import { RealInfluencerService } from '@/lib/services/realDatabaseService'
 import { InfluencerProfile } from '@/lib/types/database'
 import { Button } from '@/components/ui/Button'
 import { 
@@ -82,13 +82,10 @@ export default function InfluencersPage() {
   const loadInfluencers = async () => {
     try {
       setLoading(true)
-      const response = await InfluencerService.getInfluencers({
-        limit: 50,
-        offset: 0
-      })
+      const response = await RealInfluencerService.getInfluencers()
       
-      if (response && Array.isArray(response)) {
-        setInfluencers(response)
+      if (response && response.success && response.data) {
+        setInfluencers(response.data)
       }
     } catch (error) {
       console.error('인플루언서 로드 오류:', error)
