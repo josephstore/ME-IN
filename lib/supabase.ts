@@ -3,6 +3,10 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://jltnvoyjnzlswsmddojf.supabase.co'
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpsdG52b3lqbnpsc3dzbWRkb2pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUzODk5MjQsImV4cCI6MjA3MDk2NTkyNH0.5blt8JeShSgBA50l5bcE30Um1nGlYJAl685XBdVrqdg'
 
+// 연결 상태 확인
+console.log('Supabase URL:', supabaseUrl)
+console.log('Supabase Key:', supabaseAnonKey ? '설정됨' : '설정되지 않음')
+
 // 싱글톤 패턴으로 Supabase 클라이언트 생성
 let supabaseInstance: SupabaseClient | null = null
 
@@ -13,11 +17,43 @@ export const supabase = (() => {
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: false
+      },
+      global: {
+        fetch: (url, options = {}) => {
+          return fetch(url, {
+            ...options,
+            headers: {
+              ...options.headers,
+              'User-Agent': 'ME-IN-Platform/1.0.0'
+            }
+          })
+        }
       }
     })
   }
   return supabaseInstance
 })()
+
+// 연결 테스트 함수
+export const testSupabaseConnection = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('campaigns')
+      .select('count')
+      .limit(1)
+    
+    if (error) {
+      console.error('Supabase 연결 테스트 실패:', error)
+      return false
+    }
+    
+    console.log('Supabase 연결 테스트 성공')
+    return true
+  } catch (error) {
+    console.error('Supabase 연결 테스트 오류:', error)
+    return false
+  }
+}
 
 // Auth types
 export interface AuthUser {

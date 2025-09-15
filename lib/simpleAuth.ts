@@ -118,18 +118,26 @@ export const simpleAuth: SimpleAuth = {
   // 로그인
   login: async (email: string, password: string) => {
     try {
+      console.log('로그인 시도:', email)
+      
       // Supabase를 사용한 로그인
       const { supabase } = await import('@/lib/supabase')
+      console.log('Supabase 클라이언트 로드됨')
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       })
 
+      console.log('Supabase 응답:', { data, error })
+
       if (error) {
+        console.error('Supabase 로그인 오류:', error)
         return { success: false, error: error.message }
       }
 
       if (data.user) {
+        console.log('로그인 성공:', data.user.email)
         const authUser: SimpleUser = {
           id: data.user.id,
           email: data.user.email || '',
@@ -148,7 +156,7 @@ export const simpleAuth: SimpleAuth = {
       return { success: false, error: '로그인에 실패했습니다.' }
     } catch (error) {
       console.error('로그인 오류:', error)
-      return { success: false, error: '로그인 중 오류가 발생했습니다.' }
+      return { success: false, error: `로그인 중 오류가 발생했습니다: ${error instanceof Error ? error.message : '알 수 없는 오류'}` }
     }
   },
 
@@ -223,6 +231,32 @@ export const simpleAuth: SimpleAuth = {
 // 초기화 시 저장된 사용자 정보 로드
 const initializeAuth = () => {
   if (typeof window !== 'undefined') {
+    try {
+      const storedUser = getCurrentAuth()
+      if (storedUser) {
+        simpleAuth.user = storedUser
+        simpleAuth.isAuthenticated = true
+        console.log('Auth initialized with stored user:', storedUser)
+      } else {
+        console.log('No stored user found')
+      }
+    } catch (error) {
+      console.error('Failed to initialize auth:', error)
+      simpleAuth.user = null
+      simpleAuth.isAuthenticated = false
+    }
+  }
+}
+
+// DOM이 로드된 후 초기화
+if (typeof window !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeAuth)
+  } else {
+    initializeAuth()
+  }
+}
+
     try {
       const storedUser = getCurrentAuth()
       if (storedUser) {

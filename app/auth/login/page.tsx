@@ -63,18 +63,8 @@ const LoginForm = () => {
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full mx-4">
                 <div className="text-center mb-8">
                   <div className="flex justify-center mb-4">
-                    <div className="w-16 h-16 bg-beige-400 rounded-lg flex items-center justify-center overflow-hidden">
-                      <img 
-                        src="/images/me-in-logo.svg" 
-                        alt="ME-IN Logo" 
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement
-                          target.style.display = 'none'
-                          target.nextElementSibling?.classList.remove('hidden')
-                        }}
-                      />
-                      <span className="text-navy-600 font-bold text-2xl hidden">مين</span>
+                    <div className="w-16 h-16 bg-beige-400 rounded-lg flex items-center justify-center">
+                      <span className="text-navy-600 font-bold text-2xl">ME-IN</span>
                     </div>
                   </div>
                   <h1 className="text-3xl font-bold text-navy-600 mb-2">로그인</h1>

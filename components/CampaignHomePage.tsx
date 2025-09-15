@@ -178,18 +178,8 @@ export default function CampaignHomePage() {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-beige-400 rounded-lg flex items-center justify-center overflow-hidden">
-                <img 
-                  src="/images/me-in-logo.svg" 
-                  alt="ME-IN Logo" 
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement
-                    target.style.display = 'none'
-                    target.nextElementSibling?.classList.remove('hidden')
-                  }}
-                />
-                <span className="text-navy-600 font-bold text-sm hidden">مين</span>
+              <div className="w-8 h-8 bg-beige-400 rounded-lg flex items-center justify-center">
+                <span className="text-navy-600 font-bold text-sm">ME-IN</span>
               </div>
             </div>
             
