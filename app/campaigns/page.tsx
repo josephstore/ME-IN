@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { CampaignService } from '@/lib/services/campaignService'
+import { CampaignService } from '@/lib/services/databaseService'
 import { Campaign } from '@/lib/types/database'
 import { Button } from '@/components/ui/Button'
 import { 

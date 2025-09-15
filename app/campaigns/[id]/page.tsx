@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { CampaignService } from '@/lib/services/campaignService'
-import { ApplicationService } from '@/lib/services/applicationService'
-import { ProfileService } from '@/lib/services/profileService'
+import { CampaignService, ApplicationService, ProfileService } from '@/lib/services/databaseService'
 import { Campaign, Application, CreateApplicationRequest } from '@/lib/types/database'
 import { useSimpleAuth } from '@/lib/SimpleAuthContext'
 import { Button } from '@/components/ui/Button'

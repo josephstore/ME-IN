@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { AnalyticsService } from '@/lib/services/analyticsService'
+import { AnalyticsService } from '@/lib/services/databaseService'
 import { Button } from '@/components/ui/Button'
 import { 
   BarChart3, 

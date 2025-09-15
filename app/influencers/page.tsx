@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { InfluencerService } from '@/lib/services/influencerService'
+import { InfluencerService } from '@/lib/services/databaseService'
 import { Influencer } from '@/lib/types/database'
 import { Button } from '@/components/ui/Button'
 import { 
