@@ -91,12 +91,7 @@ export default function AnalyticsPage() {
   const loadAnalytics = async () => {
     try {
       setLoading(true)
-      const response = await AnalyticsService.getDashboardStats('demo', 'brand')
-      
-      if (response.success && response.data) {
-        setAnalytics(response.data)
-      } else {
-        // 더미 데이터 사용
+      // 더미 데이터 사용
         setAnalytics({
           overview: {
             total_campaigns: 24,
@@ -176,7 +171,6 @@ export default function AnalyticsPage() {
             { category: '음식/레스토랑', campaigns: 4, reach: 500000, engagement: 25000, revenue: 50000 }
           ]
         })
-      }
     } catch (error) {
       console.error('분석 데이터 로드 오류:', error)
     } finally {

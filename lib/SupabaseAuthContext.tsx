@@ -31,6 +31,9 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
     const demoUser = {
       id: 'demo-brand-user',
       email: 'brand@me-in.com',
+      app_metadata: {},
+      aud: 'authenticated',
+      created_at: new Date().toISOString(),
       user_metadata: {
         user_type: 'brand',
         name: 'Demo Brand User'
@@ -85,6 +88,9 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
     const demoUser = {
       id: 'demo-user',
       email,
+      app_metadata: {},
+      aud: 'authenticated',
+      created_at: new Date().toISOString(),
       user_metadata: userData
     } as User
 
@@ -108,6 +114,9 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
     const demoUser = {
       id: 'demo-brand-user',
       email,
+      app_metadata: {},
+      aud: 'authenticated',
+      created_at: new Date().toISOString(),
       user_metadata: {
         user_type: 'brand',
         name: 'Demo User'

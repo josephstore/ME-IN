@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { CampaignService, ProfileService } from '@/lib/services/databaseService'
+import { CampaignService, ProfileService, supabase } from '@/lib/services/databaseService'
 import { CreateCampaignRequest } from '@/lib/types/database'
 import { useSimpleAuth } from '@/lib/SimpleAuthContext'
 import { Button } from '@/components/ui/Button'
@@ -153,7 +153,7 @@ export default function CreateCampaignPage() {
         media_assets: uploadedUrls
       }
 
-      const response = await CampaignService.createCampaign(campaignData)
+      const response = await CampaignService.createCampaign('demo-user', campaignData)
       
       if (response.success && response.data) {
         alert('캠페인이 성공적으로 생성되었습니다!')

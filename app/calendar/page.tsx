@@ -85,7 +85,7 @@ export default function CalendarPage() {
 
   const getEventsForDate = (date: Date) => {
     const dateString = date.toISOString().split('T')[0]
-    return events.filter(event => event.eventDate === dateString)
+    return events.filter(event => event.date === dateString)
   }
 
   const getEventTypeColor = (type: string) => {

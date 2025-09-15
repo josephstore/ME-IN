@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
-import { PortfolioService, ProfileService } from '@/lib/services/databaseService'
+import { ProfileService } from '@/lib/services/databaseService'
+import { PortfolioService } from '@/lib/services/portfolioService'
 import { Portfolio, UserProfile, InfluencerProfile } from '../../lib/types/database'
 import { 
   Plus, Search, Filter, Heart, Eye, Edit, Trash2, Grid, List, Star, 
@@ -64,36 +65,54 @@ export default function PortfoliosPage() {
   const loadUserProfile = async () => {
     if (!user) return
 
-    const response = await ProfileService.getCompleteProfile()
-    if (response.success && response.data) {
-      setUserProfile(response.data.userProfile)
-      setInfluencerProfile(response.data.influencerProfile || null)
-      
-      if (response.data.influencerProfile) {
-        loadMyPortfolios(response.data.influencerProfile.id)
-      }
-    }
+    // TODO: 실제 사용자 프로필 로드 기능 구현 필요
+    // const response = await ProfileService.getCompleteProfile()
+    // if (response.success && response.data) {
+    //   setUserProfile(response.data.userProfile)
+    //   setInfluencerProfile(response.data.influencerProfile || null)
+    //   
+    //   if (response.data.influencerProfile) {
+    //     loadMyPortfolios(response.data.influencerProfile.id)
+    //   }
+    // }
+
+    // 더미 데이터
+    setUserProfile({
+      id: 'demo-user',
+      user_id: 'demo-user',
+      user_type: 'influencer',
+      display_name: 'Demo User',
+      languages: ['ko', 'en'],
+      timezone: 'Asia/Seoul',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    })
+    setInfluencerProfile(null)
   }
 
   const loadPortfolios = async () => {
     if (activeTab === 'public') {
-      const response = await PortfolioService.getPublicPortfolios(selectedCategory || undefined)
-      if (response.success && response.data) {
-        const sortedPortfolios = [...response.data]
-        
-        switch (sortBy) {
-          case 'popular':
-            sortedPortfolios.sort((a, b) => b.like_count - a.like_count)
-            break
-          case 'views':
-            sortedPortfolios.sort((a, b) => b.view_count - a.view_count)
-            break
-          default:
-            sortedPortfolios.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-        }
-        
-        setPortfolios(sortedPortfolios)
-      }
+      // TODO: 실제 공개 포트폴리오 로드 기능 구현 필요
+      // const response = await PortfolioService.getPublicPortfolios(selectedCategory || undefined)
+      // if (response.success && response.data) {
+      //   const sortedPortfolios = [...response.data]
+      //   
+      //   switch (sortBy) {
+      //     case 'popular':
+      //       sortedPortfolios.sort((a, b) => b.like_count - a.like_count)
+      //       break
+      //     case 'views':
+      //       sortedPortfolios.sort((a, b) => b.view_count - a.view_count)
+      //       break
+      //     default:
+      //       sortedPortfolios.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      //   }
+      //   
+      //   setPortfolios(sortedPortfolios)
+      // }
+
+      // 더미 데이터
+      setPortfolios([])
     }
   }
 

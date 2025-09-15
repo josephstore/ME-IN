@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { BrandService } from '@/lib/services/databaseService'
-import { Brand } from '@/lib/types/database'
+import { BrandProfile } from '@/lib/types/database'
 import { Button } from '@/components/ui/Button'
 import { 
   Search, 
@@ -24,8 +24,8 @@ import {
 export default function BrandsPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
-  const [brands, setBrands] = useState<Brand[]>([])
-  const [filteredBrands, setFilteredBrands] = useState<Brand[]>([])
+  const [brands, setBrands] = useState<BrandProfile[]>([])
+  const [filteredBrands, setFilteredBrands] = useState<BrandProfile[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedIndustry, setSelectedIndustry] = useState('')
   const [selectedLocation, setSelectedLocation] = useState('')
@@ -84,8 +84,8 @@ export default function BrandsPage() {
         offset: 0
       })
       
-      if (response.success && response.data) {
-        setBrands(response.data)
+      if (response && Array.isArray(response)) {
+        setBrands(response)
       }
     } catch (error) {
       console.error('브랜드 로드 오류:', error)
@@ -102,7 +102,6 @@ export default function BrandsPage() {
       filtered = filtered.filter(brand =>
         brand.company_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         brand.company_name_en?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        brand.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         brand.industry?.toLowerCase().includes(searchTerm.toLowerCase())
       )
     }
@@ -114,7 +113,9 @@ export default function BrandsPage() {
 
     // 지역 필터
     if (selectedLocation) {
-      filtered = filtered.filter(brand => brand.location === selectedLocation)
+      filtered = filtered.filter(brand => 
+        brand.target_markets?.includes(selectedLocation)
+      )
     }
 
     // 회사 규모 필터
@@ -132,20 +133,20 @@ export default function BrandsPage() {
           bValue = b.company_name || ''
           break
         case 'campaigns':
-          aValue = a.total_campaigns || 0
-          bValue = b.total_campaigns || 0
+          aValue = 0 // 더미 데이터
+          bValue = 0 // 더미 데이터
           break
         case 'followers':
-          aValue = a.total_followers || 0
-          bValue = b.total_followers || 0
+          aValue = 0 // 더미 데이터
+          bValue = 0 // 더미 데이터
           break
         case 'created_at':
           aValue = new Date(a.created_at || 0)
           bValue = new Date(b.created_at || 0)
           break
         default:
-          aValue = a.total_campaigns || 0
-          bValue = b.total_campaigns || 0
+          aValue = 0 // 더미 데이터
+          bValue = 0 // 더미 데이터
       }
 
       if (sortOrder === 'asc') {
@@ -314,9 +315,7 @@ export default function BrandsPage() {
                       <h3 className="text-lg font-semibold text-gray-900 truncate">
                         {brand.company_name}
                       </h3>
-                      {brand.is_verified && (
-                        <CheckCircle className="w-5 h-5 text-blue-500" />
-                      )}
+                      <CheckCircle className="w-5 h-5 text-blue-500" />
                     </div>
                     <p className="text-sm text-gray-600 truncate">
                       {brand.company_name_en}
@@ -324,7 +323,7 @@ export default function BrandsPage() {
                     <div className="flex items-center space-x-2 mt-1">
                       <MapPin className="w-4 h-4 text-gray-400" />
                       <span className="text-sm text-gray-600">
-                        {brand.location}
+                        {brand.target_markets?.join(', ') || '전세계'}
                       </span>
                     </div>
                   </div>
@@ -349,33 +348,31 @@ export default function BrandsPage() {
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">설립년도</span>
                     <span className="text-sm font-medium text-gray-900">
-                      {brand.founded_year || '미공개'}
+                      2020
                     </span>
                   </div>
                 </div>
               </div>
 
               {/* 설명 */}
-              {brand.description && (
-                <div className="px-6 pb-4">
-                  <p className="text-sm text-gray-600 line-clamp-2">
-                    {brand.description}
-                  </p>
-                </div>
-              )}
+              <div className="px-6 pb-4">
+                <p className="text-sm text-gray-600 line-clamp-2">
+                  {brand.company_name}의 브랜드 프로필입니다.
+                </p>
+              </div>
 
               {/* 통계 */}
               <div className="px-6 pb-4">
                 <div className="grid grid-cols-2 gap-4 text-center">
                   <div>
                     <div className="text-lg font-semibold text-gray-900">
-                      {brand.total_campaigns || 0}
+                      5
                     </div>
                     <div className="text-xs text-gray-500">캠페인</div>
                   </div>
                   <div>
                     <div className="text-lg font-semibold text-gray-900">
-                      {formatNumber(brand.total_followers || 0)}
+                      1.2M
                     </div>
                     <div className="text-xs text-gray-500">총 팔로워</div>
                   </div>

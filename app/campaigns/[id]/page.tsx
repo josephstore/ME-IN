@@ -82,7 +82,7 @@ export default function CampaignDetailPage() {
   const loadCampaign = async () => {
     try {
       setLoading(true)
-      const response = await CampaignService.getCampaign(campaignId)
+      const response = await CampaignService.getCampaignById(campaignId)
       
       if (response.success && response.data) {
         setCampaign(response.data)
@@ -90,16 +90,16 @@ export default function CampaignDetailPage() {
         // 브랜드인 경우 신청 목록 로드
         if (userProfile?.userProfile?.user_type === 'brand') {
           const applicationsResponse = await ApplicationService.getCampaignApplications(campaignId)
-          if (applicationsResponse.success) {
-            setApplications(applicationsResponse.data || [])
+          if (applicationsResponse && Array.isArray(applicationsResponse)) {
+            setApplications(applicationsResponse)
           }
         }
         
         // 인플루언서인 경우 이미 신청했는지 확인
         if (userProfile?.userProfile?.user_type === 'influencer') {
-          const myApplicationsResponse = await ApplicationService.getMyApplications()
-          if (myApplicationsResponse.success) {
-            const hasAppliedToThis = myApplicationsResponse.data?.some(
+          const myApplicationsResponse = await ApplicationService.getCampaignApplications(campaignId)
+          if (myApplicationsResponse && Array.isArray(myApplicationsResponse)) {
+            const hasAppliedToThis = myApplicationsResponse.some(
               app => app.campaign_id === campaignId
             )
             setHasApplied(hasAppliedToThis || false)
@@ -122,7 +122,7 @@ export default function CampaignDetailPage() {
         return
       }
 
-      const response = await ApplicationService.createApplication(applicationData)
+      const response = await ApplicationService.createApplication('demo-user', campaignId, applicationData)
       
       if (response.success) {
         alert('신청이 성공적으로 제출되었습니다!')
@@ -149,7 +149,11 @@ export default function CampaignDetailPage() {
   const handleQuickApply = async () => {
     try {
       setSubmitting(true)
-      const response = await ApplicationService.createRecommendedApplication(campaignId)
+      const response = await ApplicationService.createApplication('demo-user', campaignId, {
+        proposal: 'AI 추천 제안서입니다.',
+        expected_fee: 0,
+        status: 'approved'
+      })
       
       if (response.success) {
         alert('신청이 성공적으로 제출되었습니다!')
@@ -167,7 +171,7 @@ export default function CampaignDetailPage() {
 
   const handleApplicationStatusUpdate = async (applicationId: string, status: string, feedback?: string) => {
     try {
-      const response = await ApplicationService.updateApplicationStatus(applicationId, status as any, feedback)
+      const response = await ApplicationService.updateApplicationStatus(applicationId, status as any)
       
       if (response.success) {
         alert('신청 상태가 업데이트되었습니다.')

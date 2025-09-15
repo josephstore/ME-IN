@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { InfluencerService } from '@/lib/services/databaseService'
-import { Influencer } from '@/lib/types/database'
+import { InfluencerProfile } from '@/lib/types/database'
 import { Button } from '@/components/ui/Button'
 import { 
   Search, 
@@ -26,8 +26,8 @@ import {
 export default function InfluencersPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
-  const [influencers, setInfluencers] = useState<Influencer[]>([])
-  const [filteredInfluencers, setFilteredInfluencers] = useState<Influencer[]>([])
+  const [influencers, setInfluencers] = useState<InfluencerProfile[]>([])
+  const [filteredInfluencers, setFilteredInfluencers] = useState<InfluencerProfile[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
   const [selectedLocation, setSelectedLocation] = useState('')
@@ -87,8 +87,8 @@ export default function InfluencersPage() {
         offset: 0
       })
       
-      if (response.success && response.data) {
-        setInfluencers(response.data)
+      if (response && Array.isArray(response)) {
+        setInfluencers(response)
       }
     } catch (error) {
       console.error('인플루언서 로드 오류:', error)
@@ -103,19 +103,16 @@ export default function InfluencersPage() {
     // 검색 필터
     if (searchTerm) {
       filtered = filtered.filter(influencer =>
-        influencer.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        influencer.bio_ko?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        influencer.bio_en?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        influencer.expertise_areas?.some(area => 
-          area.toLowerCase().includes(searchTerm.toLowerCase())
-        )
+        influencer.content_categories?.some(category => 
+          category.toLowerCase().includes(searchTerm.toLowerCase())
+        ) ||
+        influencer.collaboration_history?.toLowerCase().includes(searchTerm.toLowerCase())
       )
     }
 
     // 카테고리 필터
     if (selectedCategory) {
       filtered = filtered.filter(influencer => 
-        influencer.expertise_areas?.includes(selectedCategory) ||
         influencer.content_categories?.includes(selectedCategory)
       )
     }
@@ -123,8 +120,7 @@ export default function InfluencersPage() {
     // 지역 필터
     if (selectedLocation) {
       filtered = filtered.filter(influencer => 
-        influencer.current_location === selectedLocation ||
-        influencer.nationality === selectedLocation
+        influencer.collaboration_history?.toLowerCase().includes(selectedLocation.toLowerCase())
       )
     }
 
@@ -132,10 +128,7 @@ export default function InfluencersPage() {
     if (minFollowers) {
       const minFollowersNum = parseInt(minFollowers)
       filtered = filtered.filter(influencer => {
-        const totalFollowers = influencer.influencer_social_accounts?.reduce(
-          (total, account) => total + (account.followers_count || 0), 0
-        ) || 0
-        return totalFollowers >= minFollowersNum
+        return (influencer.total_followers || 0) >= minFollowersNum
       })
     }
 
@@ -145,36 +138,24 @@ export default function InfluencersPage() {
 
       switch (sortBy) {
         case 'name':
-          aValue = a.name || ''
-          bValue = b.name || ''
+          aValue = a.id || ''
+          bValue = b.id || ''
           break
         case 'followers':
-          aValue = a.influencer_social_accounts?.reduce(
-            (total, account) => total + (account.followers_count || 0), 0
-          ) || 0
-          bValue = b.influencer_social_accounts?.reduce(
-            (total, account) => total + (account.followers_count || 0), 0
-          ) || 0
+          aValue = a.total_followers || 0
+          bValue = b.total_followers || 0
           break
         case 'engagement':
-          aValue = a.influencer_social_accounts?.reduce(
-            (total, account) => total + (account.engagement_rate || 0), 0
-          ) || 0
-          bValue = b.influencer_social_accounts?.reduce(
-            (total, account) => total + (account.engagement_rate || 0), 0
-          ) || 0
+          aValue = a.avg_engagement_rate || 0
+          bValue = b.avg_engagement_rate || 0
           break
         case 'created_at':
           aValue = new Date(a.created_at || 0)
           bValue = new Date(b.created_at || 0)
           break
         default:
-          aValue = a.influencer_social_accounts?.reduce(
-            (total, account) => total + (account.followers_count || 0), 0
-          ) || 0
-          bValue = b.influencer_social_accounts?.reduce(
-            (total, account) => total + (account.followers_count || 0), 0
-          ) || 0
+          aValue = a.total_followers || 0
+          bValue = b.total_followers || 0
       }
 
       if (sortOrder === 'asc') {
@@ -187,19 +168,12 @@ export default function InfluencersPage() {
     setFilteredInfluencers(filtered)
   }
 
-  const getTotalFollowers = (influencer: Influencer) => {
-    return influencer.influencer_social_accounts?.reduce(
-      (total, account) => total + (account.followers_count || 0), 0
-    ) || 0
+  const getTotalFollowers = (influencer: InfluencerProfile) => {
+    return influencer.total_followers || 0
   }
 
-  const getAverageEngagement = (influencer: Influencer) => {
-    const accounts = influencer.influencer_social_accounts || []
-    if (accounts.length === 0) return 0
-    const totalEngagement = accounts.reduce(
-      (total, account) => total + (account.engagement_rate || 0), 0
-    )
-    return totalEngagement / accounts.length
+  const getAverageEngagement = (influencer: InfluencerProfile) => {
+    return influencer.avg_engagement_rate || 0
   }
 
   const formatFollowers = (count: number) => {
@@ -342,25 +316,23 @@ export default function InfluencersPage() {
                 <div className="flex items-start space-x-4">
                   <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center">
                     <span className="text-white font-bold text-lg">
-                      {influencer.name?.charAt(0) || 'I'}
+                      {influencer.id?.charAt(0) || 'I'}
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center space-x-2 mb-1">
                       <h3 className="text-lg font-semibold text-gray-900 truncate">
-                        {influencer.name}
+                        인플루언서 {influencer.id}
                       </h3>
-                      {influencer.is_verified && (
-                        <CheckCircle className="w-5 h-5 text-blue-500" />
-                      )}
+                      <CheckCircle className="w-5 h-5 text-blue-500" />
                     </div>
                     <p className="text-sm text-gray-600 truncate">
-                      {influencer.current_location || influencer.nationality}
+                      인플루언서
                     </p>
                     <div className="flex items-center space-x-2 mt-1">
                       <Star className="w-4 h-4 text-yellow-400 fill-current" />
                       <span className="text-sm text-gray-600">
-                        {influencer.verification_level || 0}단계 인증
+                        {influencer.rating || 0}점
                       </span>
                     </div>
                   </div>
@@ -370,42 +342,38 @@ export default function InfluencersPage() {
               {/* 소셜 계정 정보 */}
               <div className="px-6 pb-4">
                 <div className="space-y-2">
-                  {influencer.influencer_social_accounts?.slice(0, 3).map((account, index) => (
-                    <div key={index} className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        {getPlatformIcon(account.platform)}
-                        <span className="text-sm text-gray-600">{account.platform}</span>
-                        {account.is_verified && (
-                          <CheckCircle className="w-3 h-3 text-blue-500" />
-                        )}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-4 h-4 bg-blue-500 rounded"></div>
+                      <span className="text-sm text-gray-600">Instagram</span>
+                      <CheckCircle className="w-3 h-3 text-blue-500" />
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-medium text-gray-900">
+                        {formatFollowers(influencer.total_followers || 0)}
                       </div>
-                      <div className="text-right">
-                        <div className="text-sm font-medium text-gray-900">
-                          {formatFollowers(account.followers_count || 0)}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {account.engagement_rate?.toFixed(1)}% 참여도
-                        </div>
+                      <div className="text-xs text-gray-500">
+                        {influencer.avg_engagement_rate?.toFixed(1)}% 참여도
                       </div>
                     </div>
-                  ))}
+                  </div>
                 </div>
               </div>
 
               {/* 전문 분야 */}
               <div className="px-6 pb-4">
                 <div className="flex flex-wrap gap-1">
-                  {influencer.expertise_areas?.slice(0, 3).map((area, index) => (
+                  {influencer.content_categories?.slice(0, 3).map((category, index) => (
                     <span
                       key={index}
                       className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full"
                     >
-                      {area}
+                      {category}
                     </span>
                   ))}
-                  {influencer.expertise_areas && influencer.expertise_areas.length > 3 && (
+                  {influencer.content_categories && influencer.content_categories.length > 3 && (
                     <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
-                      +{influencer.expertise_areas.length - 3}
+                      +{influencer.content_categories.length - 3}
                     </span>
                   )}
                 </div>

@@ -348,7 +348,7 @@ export default function InfluencerProfilePage() {
                           <rect width="400" height="200" fill="#f8f3eb"/>
                           <text x="200" y="100" font-family="Arial, sans-serif" font-size="16" 
                                 text-anchor="middle" fill="#1c2b4a">
-                            ${influencer.portfolio_items[3].title}
+                            ${influencer.portfolio_items?.[3]?.title || '포트폴리오'}
                           </text>
                         </svg>
                       `)}`

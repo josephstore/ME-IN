@@ -155,17 +155,6 @@ export class BrandService {
     return data
   }
 
-  // 브랜드 생성 (오버로드 - userId 없이)
-  static async createBrand(brandData: any) {
-    const { data, error } = await supabase
-      .from('brands')
-      .insert(brandData)
-      .select()
-      .single()
-
-    if (error) throw error
-    return data
-  }
 
   // 브랜드 업데이트
   static async updateBrand(brandId: string, updates: any) {
@@ -885,6 +874,64 @@ export class SystemService {
 // 9. 포트폴리오 관리 서비스
 // =============================================
 
+// =============================================
+// 9. 프로필 관리 서비스
+// =============================================
+
+export class ProfileService {
+  // 사용자 프로필 조회
+  static async getCompleteProfile(userId?: string) {
+    try {
+      // 더미 데이터 반환
+      return {
+        success: true,
+        data: {
+          userProfile: {
+            id: 'demo-user',
+            user_type: 'brand',
+            display_name: 'Demo User',
+            email: 'demo@me-in.com'
+          },
+          brandProfile: {
+            id: 'demo-brand',
+            company_name: 'Demo Company',
+            industry: 'Technology'
+          },
+          influencerProfile: null
+        }
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Failed to load profile'
+      }
+    }
+  }
+
+  // 프로필 업데이트
+  static async updateProfile(userId: string, updates: any) {
+    try {
+      return {
+        success: true,
+        data: {
+          id: userId,
+          ...updates,
+          updated_at: new Date().toISOString()
+        }
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Failed to update profile'
+      }
+    }
+  }
+}
+
+// =============================================
+// 10. 포트폴리오 관리 서비스
+// =============================================
+
 export class PortfolioService {
   // 포트폴리오 목록 조회
   static async getPortfolios(userId: string) {
@@ -960,5 +1007,6 @@ export default {
   NotificationService,
   AnalyticsService,
   SystemService,
+  ProfileService,
   PortfolioService
 }

@@ -49,35 +49,39 @@ export default function MessagesPage() {
 
   const setupRealtimeSubscriptions = () => {
     // 메시지 실시간 구독
-    const messageSubscription = MessagingService.subscribeToMessages((message) => {
-      if (selectedConversation && 
-          (message.sender_id === selectedConversation.conversation_id || 
-           message.receiver_id === selectedConversation.conversation_id)) {
-        setMessages(prev => [...prev, message])
-      }
-      loadConversations() // 대화 목록 업데이트
-      loadUnreadCounts()
-    })
+    // TODO: 실시간 구독 기능 구현 필요
+    // const messageSubscription = MessagingService.subscribeToMessages((message) => {
+    //   if (selectedConversation && 
+    //       (message.sender_id === selectedConversation.conversation_id || 
+    //        message.receiver_id === selectedConversation.conversation_id)) {
+    //     setMessages(prev => [...prev, message])
+    //   }
+    //   loadConversations() // 대화 목록 업데이트
+    //   loadUnreadCounts()
+    // })
 
     // 알림 실시간 구독
-    const notificationSubscription = MessagingService.subscribeToNotifications((notification) => {
-      setNotifications(prev => [notification, ...prev])
-      loadUnreadCounts()
-    })
+    // TODO: 실시간 구독 기능 구현 필요
+    // const notificationSubscription = MessagingService.subscribeToNotifications((notification) => {
+    //   setNotifications(prev => [notification, ...prev])
+    //   loadUnreadCounts()
+    // })
 
     return () => {
-      messageSubscription.unsubscribe()
-      notificationSubscription.unsubscribe()
+      // messageSubscription.unsubscribe()
+      // notificationSubscription.unsubscribe()
     }
   }
 
   const loadConversations = async () => {
     try {
       setLoading(true)
-      const response = await MessagingService.getConversations()
-      if (response.success) {
-        setConversations(response.data || [])
-      }
+      // TODO: 실제 대화 목록 로드 기능 구현 필요
+      // const response = await MessagingService.getUserChatRooms('demo-user')
+      // if (response.success) {
+      //   setConversations(response.data || [])
+      // }
+      setConversations([]) // 더미 데이터
     } catch (error) {
       console.error('대화 목록 로드 오류:', error)
     } finally {
@@ -87,10 +91,12 @@ export default function MessagesPage() {
 
   const loadMessages = async (conversationId: string) => {
     try {
-      const response = await MessagingService.getMessages(conversationId)
-      if (response.success) {
-        setMessages(response.data || [])
-      }
+      // TODO: 실제 메시지 로드 기능 구현 필요
+      // const response = await MessagingService.getChatMessages(conversationId)
+      // if (response.success) {
+      //   setMessages(response.data || [])
+      // }
+      setMessages([]) // 더미 데이터
     } catch (error) {
       console.error('메시지 로드 오류:', error)
     }
@@ -98,10 +104,12 @@ export default function MessagesPage() {
 
   const loadNotifications = async () => {
     try {
-      const response = await MessagingService.getNotifications()
-      if (response.success) {
-        setNotifications(response.data || [])
-      }
+      // TODO: 실제 알림 로드 기능 구현 필요
+      // const response = await MessagingService.getUserNotifications('demo-user')
+      // if (response.success) {
+      //   setNotifications(response.data || [])
+      // }
+      setNotifications([]) // 더미 데이터
     } catch (error) {
       console.error('알림 로드 오류:', error)
     }
@@ -109,14 +117,15 @@ export default function MessagesPage() {
 
   const loadUnreadCounts = async () => {
     try {
-      const [messageCount, notificationCount] = await Promise.all([
-        MessagingService.getUnreadMessageCount(),
-        MessagingService.getUnreadNotificationCount()
-      ])
+      // TODO: 실제 읽지 않은 메시지 수 로드 기능 구현 필요
+      // const [messageCount, notificationCount] = await Promise.all([
+      //   MessagingService.getUnreadMessageCount(),
+      //   MessagingService.getUnreadNotificationCount()
+      // ])
 
       setUnreadCounts({
-        messages: messageCount.success ? messageCount.data || 0 : 0,
-        notifications: notificationCount.success ? notificationCount.data || 0 : 0
+        messages: 0, // 더미 데이터
+        notifications: 0 // 더미 데이터
       })
     } catch (error) {
       console.error('읽지 않은 수 로드 오류:', error)
@@ -128,16 +137,19 @@ export default function MessagesPage() {
 
     try {
       setSending(true)
-      const response = await MessagingService.sendMessage({
-        receiver_id: selectedConversation.conversation_id,
-        content: newMessage,
-        message_type: 'text'
-      })
+      // TODO: 실제 메시지 전송 기능 구현 필요
+      // const response = await MessagingService.sendMessage(
+      //   selectedConversation.conversation_id,
+      //   'demo-user',
+      //   newMessage,
+      //   'text'
+      // )
 
-      if (response.success) {
-        setNewMessage('')
-        setMessages(prev => [...prev, response.data!])
-      }
+      // if (response.success) {
+      //   setNewMessage('')
+      //   setMessages(prev => [...prev, response.data!])
+      // }
+      setNewMessage('') // 더미 데이터
     } catch (error) {
       console.error('메시지 전송 오류:', error)
     } finally {
@@ -151,21 +163,23 @@ export default function MessagesPage() {
 
     try {
       setSending(true)
-      const uploadResponse = await MessagingService.uploadFile(file)
+      // TODO: 실제 파일 업로드 기능 구현 필요
+      // const uploadResponse = await MessagingService.uploadFile(file)
       
-      if (uploadResponse.success) {
-        const messageType = file.type.startsWith('image/') ? 'image' : 'file'
-        const response = await MessagingService.sendMessage({
-          receiver_id: selectedConversation.conversation_id,
-          content: file.name,
-          message_type: messageType,
-          file_url: uploadResponse.data || undefined
-        })
+      // if (uploadResponse.success) {
+      //   const messageType = file.type.startsWith('image/') ? 'image' : 'file'
+      //   const response = await MessagingService.sendMessage(
+      //     selectedConversation.conversation_id,
+      //     'demo-user',
+      //     file.name,
+      //     messageType
+      //   )
 
-        if (response.success) {
-          setMessages(prev => [...prev, response.data!])
-        }
-      }
+      //   if (response.success) {
+      //     setMessages(prev => [...prev, response.data!])
+      //   }
+      // }
+      console.log('파일 업로드:', file.name) // 더미 데이터
     } catch (error) {
       console.error('파일 업로드 오류:', error)
     } finally {
@@ -175,7 +189,8 @@ export default function MessagesPage() {
 
   const markNotificationAsRead = async (notificationId: string) => {
     try {
-      await MessagingService.markNotificationAsRead(notificationId)
+      // TODO: 실제 알림 읽음 처리 기능 구현 필요
+      // await MessagingService.markNotificationAsRead(notificationId)
       setNotifications(prev => 
         prev.map(notif => 
           notif.id === notificationId ? { ...notif, is_read: true } : notif
@@ -189,7 +204,8 @@ export default function MessagesPage() {
 
   const markAllNotificationsAsRead = async () => {
     try {
-      await MessagingService.markAllNotificationsAsRead()
+      // TODO: 실제 모든 알림 읽음 처리 기능 구현 필요
+      // await MessagingService.markAllNotificationsAsRead()
       setNotifications(prev => prev.map(notif => ({ ...notif, is_read: true })))
       loadUnreadCounts()
     } catch (error) {

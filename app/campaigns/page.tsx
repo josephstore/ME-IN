@@ -67,8 +67,8 @@ export default function CampaignsPage() {
         offset: 0
       })
       
-      if (response.success && response.data) {
-        setCampaigns(response.data)
+      if (response && Array.isArray(response)) {
+        setCampaigns(response)
       }
     } catch (error) {
       console.error('캠페인 로드 오류:', error)

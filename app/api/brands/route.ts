@@ -152,7 +152,7 @@ export async function POST(request: NextRequest) {
     
     // 실제 데이터베이스에 브랜드 생성 시도
     try {
-      const newBrand = await BrandService.createBrand(body)
+      const newBrand = await BrandService.createBrand('demo-user', body)
       
       return NextResponse.json({
         success: true,

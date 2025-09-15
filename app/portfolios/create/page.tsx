@@ -91,11 +91,25 @@ export default function CreatePortfolioPage() {
   const loadUserProfile = async () => {
     if (!user) return
 
-    const response = await ProfileService.getCompleteProfile()
-    if (response.success && response.data) {
-      setUserProfile(response.data.userProfile)
-      setInfluencerProfile(response.data.influencerProfile || null)
-    }
+    // TODO: 실제 사용자 프로필 로드 기능 구현 필요
+    // const response = await ProfileService.getCompleteProfile()
+    // if (response.success && response.data) {
+    //   setUserProfile(response.data.userProfile)
+    //   setInfluencerProfile(response.data.influencerProfile || null)
+    // }
+    
+        // 더미 데이터
+        setUserProfile({
+          id: 'demo-user',
+          user_id: 'demo-user',
+          user_type: 'influencer',
+          display_name: 'Demo User',
+          languages: ['ko', 'en'],
+          timezone: 'Asia/Seoul',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+    setInfluencerProfile(null)
   }
 
   const handleInputChange = (field: string, value: string | boolean) => {

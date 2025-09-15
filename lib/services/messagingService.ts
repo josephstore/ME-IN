@@ -334,7 +334,7 @@ export class MessagingService {
         brand_id: otherUserId, // 실제로는 캠페인에서 브랜드 ID를 가져와야 함
         influencer_id: otherUserId,
         last_message: {
-          id: data.id,
+          id: 'dummy-message-id',
           sender_id: data.sender_id,
           receiver_id: data.receiver_id,
           campaign_id: data.campaign_id,
