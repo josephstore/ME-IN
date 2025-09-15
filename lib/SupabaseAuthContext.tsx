@@ -27,6 +27,31 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // 데모 모드에서는 항상 브랜드 사용자로 설정
+    const demoUser = {
+      id: 'demo-brand-user',
+      email: 'brand@me-in.com',
+      user_metadata: {
+        user_type: 'brand',
+        name: 'Demo Brand User'
+      }
+    } as User
+
+    const demoSession = {
+      user: demoUser,
+      access_token: 'demo-token',
+      refresh_token: 'demo-refresh-token',
+      expires_at: Date.now() + 3600000, // 1시간 후
+      expires_in: 3600,
+      token_type: 'bearer'
+    } as Session
+
+    setSession(demoSession)
+    setUser(demoUser)
+    setLoading(false)
+
+    // 실제 Supabase 인증이 필요한 경우에만 아래 코드 사용
+    /*
     // Get initial session
     const getInitialSession = async () => {
       const { data: { session } } = await supabase.auth.getSession()
@@ -47,6 +72,7 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
     )
 
     return () => subscription.unsubscribe()
+    */
   }, [])
 
   const signUp = async (email: string, password: string, userData: {
@@ -55,36 +81,70 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
     language?: string[]
     timezone?: string
   }) => {
-    const { error } = await supabase.auth.signUp({
+    // 데모 모드에서는 항상 성공
+    const demoUser = {
+      id: 'demo-user',
       email,
-      password,
-      options: {
-        data: userData
-      }
-    })
+      user_metadata: userData
+    } as User
 
-    return { error }
+    const demoSession = {
+      user: demoUser,
+      access_token: 'demo-token',
+      refresh_token: 'demo-refresh-token',
+      expires_at: Date.now() + 3600000,
+      expires_in: 3600,
+      token_type: 'bearer'
+    } as Session
+
+    setSession(demoSession)
+    setUser(demoUser)
+
+    return { error: null }
   }
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    // 데모 모드에서는 항상 성공
+    const demoUser = {
+      id: 'demo-brand-user',
       email,
-      password
-    })
+      user_metadata: {
+        user_type: 'brand',
+        name: 'Demo User'
+      }
+    } as User
 
-    return { error }
+    const demoSession = {
+      user: demoUser,
+      access_token: 'demo-token',
+      refresh_token: 'demo-refresh-token',
+      expires_at: Date.now() + 3600000,
+      expires_in: 3600,
+      token_type: 'bearer'
+    } as Session
+
+    setSession(demoSession)
+    setUser(demoUser)
+
+    return { error: null }
   }
 
   const signOut = async () => {
-    await supabase.auth.signOut()
+    // 데모 모드에서는 세션 초기화
+    setSession(null)
+    setUser(null)
   }
 
   const updateProfile = async (updates: Partial<AuthUser['user_metadata']>) => {
-    const { error } = await supabase.auth.updateUser({
-      data: updates
-    })
-
-    return { error }
+    // 데모 모드에서는 항상 성공
+    if (user) {
+      const updatedUser = {
+        ...user,
+        user_metadata: { ...user.user_metadata, ...updates }
+      }
+      setUser(updatedUser)
+    }
+    return { error: null }
   }
 
   const value = {

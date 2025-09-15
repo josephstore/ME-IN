@@ -1,0 +1,10 @@
+[33m158c8b9[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m 플로팅 버튼 위치 조정 - 하단바 위쪽에 고정
+[33m794e0b2[m 하단바 섹션별 페이지 구현 완료 및 전체 기능 업데이트
+[33m081384e[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m 이미지 관리 시스템 전체 개선 - Supabase Storage 버킷 설정, ImageService 통합, 이미지 최적화, 에러 처리 완료
+[33md3cef12[m Phase 1.1: 프로필 관리 시스템 구현 - 데이터베이스 스키마 확장, 프로필 서비스, 프로필 페이지, 타입 정의 완료
+[33mb604d7d[m Add campaign images based on provided descriptions - Carery toner, K-pop concert, Korean food, Dubai travel, and ME-IN logo
+[33med3e3cb[m Update campaign images to use Supabase Storage URLs
+[33m4de14b5[m Add custom SVG images for logo and campaigns - Create logo.svg with Arabic text 'مين' - Add carery-toner.svg with bottle and leaves design - Add kpop-concert.svg with stage and audience - Add korean-food.svg with bowl and noodles - Add dubai-travel.svg with Burj Al Arab and palm trees - Update component to use SVG images
+[33m4fbfba4[m Add campaign images and update logo - Add custom campaign images with emojis and gradients - Update logo with proper Arabic text 'مين' - Improve visual design for each campaign category - Fix ESLint errors
+[33mc8735dc[m Transform to mobile campaign platform - Add mobile-friendly campaign homepage with Korean-first design - Implement campaign cards with search and filtering - Add bottom navigation with mobile UI - Update README with mobile platform documentation - Fix ESLint errors
+[33m2db4142[m Update homepage to show service landing page instead of deployment success message

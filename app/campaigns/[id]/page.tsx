@@ -6,7 +6,7 @@ import { CampaignService } from '@/lib/services/campaignService'
 import { ApplicationService } from '@/lib/services/applicationService'
 import { ProfileService } from '@/lib/services/profileService'
 import { Campaign, Application, CreateApplicationRequest } from '@/lib/types/database'
-import { supabase } from '@/lib/supabase'
+import { useSimpleAuth } from '@/lib/SimpleAuthContext'
 import { Button } from '@/components/ui/Button'
 import { 
   ArrowLeft, 
@@ -32,7 +32,7 @@ export default function CampaignDetailPage() {
   
   const [loading, setLoading] = useState(true)
   const [campaign, setCampaign] = useState<Campaign | null>(null)
-  const [user, setUser] = useState<any>(null)
+  const { user, isAuthenticated } = useSimpleAuth()
   const [userProfile, setUserProfile] = useState<any>(null)
   const [applications, setApplications] = useState<Application[]>([])
   const [matchScore, setMatchScore] = useState<number>(0)
@@ -57,26 +57,28 @@ export default function CampaignDetailPage() {
   }, [campaignId])
 
   const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user) {
-      setUser(user)
-      const profileResponse = await ProfileService.getCompleteProfile()
-      if (profileResponse.success && profileResponse.data) {
-        setUserProfile(profileResponse.data)
-        
-        // 매칭 점수 계산 (인플루언서인 경우)
-        if (profileResponse.data.userProfile.user_type === 'influencer' && 
-            profileResponse.data.influencerProfile) {
-          const scoreResponse = await ApplicationService.calculateMatchScore(
-            campaignId, 
-            profileResponse.data.influencerProfile.id
-          )
-          if (scoreResponse.success) {
-            setMatchScore(scoreResponse.data || 0)
-          }
-        }
-      }
+    if (!isAuthenticated) {
+      return
     }
+    
+    // 간단한 프로필 설정
+    const profile = {
+      userProfile: {
+        user_type: user?.user_type,
+        display_name: user?.name
+      },
+      brandProfile: user?.user_type === 'brand' ? {
+        id: user?.id,
+        company_name: `${user?.name} Company`
+      } : null,
+      influencerProfile: user?.user_type === 'influencer' ? {
+        id: user?.id,
+        display_name: user?.name
+      } : null
+    }
+    
+    setUserProfile(profile)
+    setMatchScore(85) // 데모 매칭 점수
   }
 
   const loadCampaign = async () => {
@@ -494,25 +496,10 @@ export default function CampaignDetailPage() {
                           )}
                         </div>
 
-                        {application.status === 'pending' && (
-                          <div className="flex space-x-2">
-                            <Button
-                              onClick={() => handleApplicationStatusUpdate(application.id, 'approved')}
-                              size="sm"
-                              className="bg-green-600 hover:bg-green-700"
-                            >
-                              <Check className="w-4 h-4 mr-1" />
-                              승인
-                            </Button>
-                            <Button
-                              onClick={() => handleApplicationStatusUpdate(application.id, 'rejected')}
-                              size="sm"
-                              variant="outline"
-                              className="text-red-600 hover:text-red-700"
-                            >
-                              <X className="w-4 h-4 mr-1" />
-                              거절
-                            </Button>
+                        {application.status === 'approved' && (
+                          <div className="flex items-center space-x-1 text-sm text-green-600">
+                            <Check className="w-4 h-4" />
+                            <span>자동 승인됨</span>
                           </div>
                         )}
                       </div>

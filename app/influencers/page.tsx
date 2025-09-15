@@ -1,344 +1,482 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { InfluencerService } from '@/lib/services/influencerService'
+import { Influencer } from '@/lib/types/database'
+import { Button } from '@/components/ui/Button'
 import { 
-  DollarSign, Users, TrendingUp, Globe, Shield, BarChart3, 
-  CheckCircle, ArrowRight, Star, Award, Zap, Headphones, Camera, Video
+  Search, 
+  Filter, 
+  Users, 
+  Globe, 
+  Star,
+  Eye,
+  MapPin,
+  Calendar,
+  Instagram,
+  Youtube,
+  Twitter,
+  CheckCircle,
+  Award,
+  Heart,
+  MessageCircle
 } from 'lucide-react'
 
 export default function InfluencersPage() {
   const router = useRouter()
-
-  const benefits = [
-    {
-      icon: DollarSign,
-      title: '수익 창출',
-      description: '다양한 브랜드와 협업하여 안정적인 수익을 만들어보세요'
-    },
-    {
-      icon: Users,
-      title: '글로벌 네트워크',
-      description: '한국 브랜드와 연결되어 글로벌 시장에 진출할 수 있습니다'
-    },
-    {
-      icon: TrendingUp,
-      title: '성장 기회',
-      description: 'AI 매칭으로 최적의 브랜드와 연결되어 함께 성장하세요'
-    },
-    {
-      icon: Globe,
-      title: '문화 교류',
-      description: '한국과 중동 문화를 연결하는 브리지 역할을 해보세요'
-    },
-    {
-      icon: Shield,
-      title: '안전한 협업',
-      description: '검증된 브랜드와 안전하게 협업할 수 있습니다'
-    },
-    {
-      icon: BarChart3,
-      title: '성과 분석',
-      description: '상세한 성과 분석으로 더 나은 콘텐츠를 만들어보세요'
-    }
-  ]
-
-  const successStories = [
-    {
-      name: '사라 알리',
-      category: '뷰티 인플루언서',
-      followers: '150K',
-      content: '한국 화장품 브랜드와 협업하면서 수익이 3배 증가했어요!',
-      rating: 5,
-      avatar: '/api/placeholder/60/60'
-    },
-    {
-      name: '아흐메드 칸',
-      category: '푸드 인플루언서',
-      followers: '200K',
-      content: 'ME-IN을 통해 한국 음식 브랜드와 연결되어 새로운 기회를 얻었습니다.',
-      rating: 5,
-      avatar: '/api/placeholder/60/60'
-    },
-    {
-      name: '파티마 알자브리',
-      category: '패션 인플루언서',
-      followers: '300K',
-      content: '한국 패션 브랜드와의 협업이 정말 만족스러워요. 수익도 크게 늘었습니다.',
-      rating: 5,
-      avatar: '/api/placeholder/60/60'
-    }
-  ]
+  const [loading, setLoading] = useState(true)
+  const [influencers, setInfluencers] = useState<Influencer[]>([])
+  const [filteredInfluencers, setFilteredInfluencers] = useState<Influencer[]>([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState('')
+  const [selectedLocation, setSelectedLocation] = useState('')
+  const [minFollowers, setMinFollowers] = useState('')
+  const [sortBy, setSortBy] = useState('followers')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
 
   const categories = [
-    { name: '뷰티/메이크업', icon: Camera, count: '2,500+' },
-    { name: '패션/스타일', icon: Video, count: '3,200+' },
-    { name: '푸드/요리', icon: Camera, count: '1,800+' },
-    { name: '여행/라이프스타일', icon: Video, count: '2,100+' },
-    { name: '테크/가전', icon: Camera, count: '900+' },
-    { name: '게임/엔터테인먼트', icon: Video, count: '1,500+' },
-    { name: '교육/지식', icon: Camera, count: '800+' },
-    { name: '건강/피트니스', icon: Video, count: '1,200+' }
+    '뷰티/화장품',
+    '패션/의류',
+    '음식/레스토랑',
+    '여행/호텔',
+    '테크/전자제품',
+    '건강/운동',
+    '교육/온라인강의',
+    '게임/엔터테인먼트',
+    '라이프스타일',
+    '기타'
   ]
 
-  const earnings = [
-    {
-      range: '1K - 10K 팔로워',
-      avgEarnings: '$500 - $2,000',
-      description: '월 평균 수익'
-    },
-    {
-      range: '10K - 100K 팔로워',
-      avgEarnings: '$2,000 - $10,000',
-      description: '월 평균 수익'
-    },
-    {
-      range: '100K+ 팔로워',
-      avgEarnings: '$10,000+',
-      description: '월 평균 수익'
-    }
+  const locations = [
+    'Saudi Arabia',
+    'UAE',
+    'Qatar',
+    'Kuwait',
+    'Bahrain',
+    'Oman',
+    'Jordan',
+    'Lebanon',
+    'Egypt',
+    'Morocco',
+    'Turkey',
+    '기타'
   ]
+
+  const followerRanges = [
+    { value: '1000', label: '1K+' },
+    { value: '10000', label: '10K+' },
+    { value: '100000', label: '100K+' },
+    { value: '500000', label: '500K+' },
+    { value: '1000000', label: '1M+' }
+  ]
+
+  useEffect(() => {
+    loadInfluencers()
+  }, [])
+
+  useEffect(() => {
+    filterAndSortInfluencers()
+  }, [influencers, searchTerm, selectedCategory, selectedLocation, minFollowers, sortBy, sortOrder])
+
+  const loadInfluencers = async () => {
+    try {
+      setLoading(true)
+      const response = await InfluencerService.getInfluencers({
+        limit: 50,
+        offset: 0
+      })
+      
+      if (response.success && response.data) {
+        setInfluencers(response.data)
+      }
+    } catch (error) {
+      console.error('인플루언서 로드 오류:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const filterAndSortInfluencers = () => {
+    let filtered = [...influencers]
+
+    // 검색 필터
+    if (searchTerm) {
+      filtered = filtered.filter(influencer =>
+        influencer.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        influencer.bio_ko?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        influencer.bio_en?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        influencer.expertise_areas?.some(area => 
+          area.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      )
+    }
+
+    // 카테고리 필터
+    if (selectedCategory) {
+      filtered = filtered.filter(influencer => 
+        influencer.expertise_areas?.includes(selectedCategory) ||
+        influencer.content_categories?.includes(selectedCategory)
+      )
+    }
+
+    // 지역 필터
+    if (selectedLocation) {
+      filtered = filtered.filter(influencer => 
+        influencer.current_location === selectedLocation ||
+        influencer.nationality === selectedLocation
+      )
+    }
+
+    // 최소 팔로워 필터
+    if (minFollowers) {
+      const minFollowersNum = parseInt(minFollowers)
+      filtered = filtered.filter(influencer => {
+        const totalFollowers = influencer.influencer_social_accounts?.reduce(
+          (total, account) => total + (account.followers_count || 0), 0
+        ) || 0
+        return totalFollowers >= minFollowersNum
+      })
+    }
+
+    // 정렬
+    filtered.sort((a, b) => {
+      let aValue: any, bValue: any
+
+      switch (sortBy) {
+        case 'name':
+          aValue = a.name || ''
+          bValue = b.name || ''
+          break
+        case 'followers':
+          aValue = a.influencer_social_accounts?.reduce(
+            (total, account) => total + (account.followers_count || 0), 0
+          ) || 0
+          bValue = b.influencer_social_accounts?.reduce(
+            (total, account) => total + (account.followers_count || 0), 0
+          ) || 0
+          break
+        case 'engagement':
+          aValue = a.influencer_social_accounts?.reduce(
+            (total, account) => total + (account.engagement_rate || 0), 0
+          ) || 0
+          bValue = b.influencer_social_accounts?.reduce(
+            (total, account) => total + (account.engagement_rate || 0), 0
+          ) || 0
+          break
+        case 'created_at':
+          aValue = new Date(a.created_at || 0)
+          bValue = new Date(b.created_at || 0)
+          break
+        default:
+          aValue = a.influencer_social_accounts?.reduce(
+            (total, account) => total + (account.followers_count || 0), 0
+          ) || 0
+          bValue = b.influencer_social_accounts?.reduce(
+            (total, account) => total + (account.followers_count || 0), 0
+          ) || 0
+      }
+
+      if (sortOrder === 'asc') {
+        return aValue > bValue ? 1 : -1
+      } else {
+        return aValue < bValue ? 1 : -1
+      }
+    })
+
+    setFilteredInfluencers(filtered)
+  }
+
+  const getTotalFollowers = (influencer: Influencer) => {
+    return influencer.influencer_social_accounts?.reduce(
+      (total, account) => total + (account.followers_count || 0), 0
+    ) || 0
+  }
+
+  const getAverageEngagement = (influencer: Influencer) => {
+    const accounts = influencer.influencer_social_accounts || []
+    if (accounts.length === 0) return 0
+    const totalEngagement = accounts.reduce(
+      (total, account) => total + (account.engagement_rate || 0), 0
+    )
+    return totalEngagement / accounts.length
+  }
+
+  const formatFollowers = (count: number) => {
+    if (count >= 1000000) {
+      return `${(count / 1000000).toFixed(1)}M`
+    } else if (count >= 1000) {
+      return `${(count / 1000).toFixed(1)}K`
+    }
+    return count.toString()
+  }
+
+  const getPlatformIcon = (platform: string) => {
+    switch (platform.toLowerCase()) {
+      case 'instagram':
+        return <Instagram className="w-4 h-4" />
+      case 'youtube':
+        return <Youtube className="w-4 h-4" />
+      case 'twitter':
+        return <Twitter className="w-4 h-4" />
+      default:
+        return <Users className="w-4 h-4" />
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">인플루언서를 불러오는 중...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-purple-600 to-purple-800 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              당신의 영향력을<br />
-              <span className="text-yellow-300">수익으로</span>
-            </h1>
-            <p className="text-xl md:text-2xl mb-8 text-purple-100">
-              한국 브랜드와 연결되어 새로운 수익 창출 기회를 만들어보세요<br />
-              AI 매칭으로 최적의 브랜드를 찾아드립니다
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                onClick={() => router.push('/auth/register/influencer')}
-                className="bg-white text-purple-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors flex items-center justify-center gap-2"
-              >
-                인플루언서 등록하기
-                <ArrowRight className="w-5 h-5" />
-              </button>
-              <button
-                onClick={() => router.push('/guide')}
-                className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-purple-600 transition-colors"
-              >
-                가이드 보기
-              </button>
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* 헤더 */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">인플루언서 탐색</h1>
+              <p className="text-gray-600 mt-1">
+                브랜드에 최적의 인플루언서를 찾아보세요
+              </p>
+            </div>
+            <div className="text-sm text-gray-500">
+              총 {filteredInfluencers.length}명의 인플루언서
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Benefits Section */}
-      <div className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              인플루언서를 위한 특별한 혜택
-            </h2>
-            <p className="text-xl text-gray-600">
-              ME-IN에서만 누릴 수 있는 독특한 기회들
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {benefits.map((benefit, index) => (
-              <div key={index} className="text-center p-6 rounded-lg hover:shadow-lg transition-shadow">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <benefit.icon className="w-8 h-8 text-purple-600" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">{benefit.title}</h3>
-                <p className="text-gray-600">{benefit.description}</p>
-              </div>
-            ))}
+        {/* 검색 및 필터 */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            {/* 검색 */}
+            <div className="relative">
+              <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="인플루언서 검색..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* 카테고리 필터 */}
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">모든 카테고리</option>
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+
+            {/* 지역 필터 */}
+            <select
+              value={selectedLocation}
+              onChange={(e) => setSelectedLocation(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">모든 지역</option>
+              {locations.map((location) => (
+                <option key={location} value={location}>
+                  {location}
+                </option>
+              ))}
+            </select>
+
+            {/* 최소 팔로워 필터 */}
+            <select
+              value={minFollowers}
+              onChange={(e) => setMinFollowers(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">모든 팔로워</option>
+              {followerRanges.map((range) => (
+                <option key={range.value} value={range.value}>
+                  {range.label} 팔로워
+                </option>
+              ))}
+            </select>
+
+            {/* 정렬 */}
+            <select
+              value={`${sortBy}-${sortOrder}`}
+              onChange={(e) => {
+                const [field, order] = e.target.value.split('-')
+                setSortBy(field)
+                setSortOrder(order as 'asc' | 'desc')
+              }}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="followers-desc">팔로워 많은순</option>
+              <option value="followers-asc">팔로워 적은순</option>
+              <option value="engagement-desc">참여도 높은순</option>
+              <option value="engagement-asc">참여도 낮은순</option>
+              <option value="name-asc">이름순</option>
+              <option value="created_at-desc">최신순</option>
+            </select>
           </div>
         </div>
-      </div>
 
-      {/* Stats Section */}
-      <div className="py-20 bg-gray-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              인플루언서들의 놀라운 성과
-            </h2>
-            <p className="text-xl text-gray-300">
-              ME-IN과 함께한 인플루언서들의 실제 성과를 확인해보세요
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-purple-400 mb-2">15,000+</div>
-              <div className="text-gray-300">등록된 인플루언서</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-purple-400 mb-2">₩50억+</div>
-              <div className="text-gray-300">총 수익 창출</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-purple-400 mb-2">95%</div>
-              <div className="text-gray-300">만족도</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-purple-400 mb-2">8개</div>
-              <div className="text-gray-300">카테고리</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Categories Section */}
-      <div className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              다양한 콘텐츠 카테고리
-            </h2>
-            <p className="text-xl text-gray-600">
-              어떤 분야든 ME-IN에서 성공할 수 있습니다
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {categories.map((category, index) => (
-              <div key={index} className="text-center p-6 rounded-lg bg-gray-50 hover:bg-purple-50 transition-colors">
-                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <category.icon className="w-6 h-6 text-purple-600" />
-                </div>
-                <h3 className="font-semibold text-gray-900 mb-1">{category.name}</h3>
-                <p className="text-sm text-purple-600 font-medium">{category.count} 인플루언서</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Earnings Section */}
-      <div className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              팔로워 수별 예상 수익
-            </h2>
-            <p className="text-xl text-gray-600">
-              실제 인플루언서들의 평균 수익을 확인해보세요
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {earnings.map((earning, index) => (
-              <div key={index} className="bg-white p-8 rounded-lg shadow-lg text-center">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">{earning.range}</h3>
-                <div className="text-3xl font-bold text-purple-600 mb-2">{earning.avgEarnings}</div>
-                <p className="text-gray-600">{earning.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Success Stories Section */}
-      <div className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              성공 스토리
-            </h2>
-            <p className="text-xl text-gray-600">
-              ME-IN과 함께 성장한 인플루언서들의 실제 경험담
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {successStories.map((story, index) => (
-              <div key={index} className="bg-gray-50 p-6 rounded-lg">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-purple-200 rounded-full flex items-center justify-center mr-4">
-                    <span className="text-purple-600 font-semibold">{story.name.charAt(0)}</span>
+        {/* 인플루언서 목록 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredInfluencers.map((influencer) => (
+            <div
+              key={influencer.id}
+              className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
+            >
+              {/* 프로필 헤더 */}
+              <div className="p-6 pb-4">
+                <div className="flex items-start space-x-4">
+                  <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center">
+                    <span className="text-white font-bold text-lg">
+                      {influencer.name?.charAt(0) || 'I'}
+                    </span>
                   </div>
-                  <div>
-                    <div className="font-semibold text-gray-900">{story.name}</div>
-                    <div className="text-sm text-gray-600">{story.category} • {story.followers} 팔로워</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center space-x-2 mb-1">
+                      <h3 className="text-lg font-semibold text-gray-900 truncate">
+                        {influencer.name}
+                      </h3>
+                      {influencer.is_verified && (
+                        <CheckCircle className="w-5 h-5 text-blue-500" />
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-600 truncate">
+                      {influencer.current_location || influencer.nationality}
+                    </p>
+                    <div className="flex items-center space-x-2 mt-1">
+                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                      <span className="text-sm text-gray-600">
+                        {influencer.verification_level || 0}단계 인증
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center mb-4">
-                  {[...Array(story.rating)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
+              </div>
+
+              {/* 소셜 계정 정보 */}
+              <div className="px-6 pb-4">
+                <div className="space-y-2">
+                  {influencer.influencer_social_accounts?.slice(0, 3).map((account, index) => (
+                    <div key={index} className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        {getPlatformIcon(account.platform)}
+                        <span className="text-sm text-gray-600">{account.platform}</span>
+                        {account.is_verified && (
+                          <CheckCircle className="w-3 h-3 text-blue-500" />
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-medium text-gray-900">
+                          {formatFollowers(account.followers_count || 0)}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {account.engagement_rate?.toFixed(1)}% 참여도
+                        </div>
+                      </div>
+                    </div>
                   ))}
                 </div>
-                <p className="text-gray-700">&quot;{story.content}&quot;</p>
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
 
-      {/* How It Works Section */}
-      <div className="py-20 bg-gray-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              간단한 3단계로 시작하세요
-            </h2>
-            <p className="text-xl text-gray-300">
-              ME-IN에서 인플루언서 활동을 시작하는 방법
+              {/* 전문 분야 */}
+              <div className="px-6 pb-4">
+                <div className="flex flex-wrap gap-1">
+                  {influencer.expertise_areas?.slice(0, 3).map((area, index) => (
+                    <span
+                      key={index}
+                      className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full"
+                    >
+                      {area}
+                    </span>
+                  ))}
+                  {influencer.expertise_areas && influencer.expertise_areas.length > 3 && (
+                    <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+                      +{influencer.expertise_areas.length - 3}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* 통계 */}
+              <div className="px-6 pb-4">
+                <div className="grid grid-cols-2 gap-4 text-center">
+                  <div>
+                    <div className="text-lg font-semibold text-gray-900">
+                      {formatFollowers(getTotalFollowers(influencer))}
+                    </div>
+                    <div className="text-xs text-gray-500">총 팔로워</div>
+                  </div>
+                  <div>
+                    <div className="text-lg font-semibold text-gray-900">
+                      {getAverageEngagement(influencer).toFixed(1)}%
+                    </div>
+                    <div className="text-xs text-gray-500">평균 참여도</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 액션 버튼 */}
+              <div className="px-6 pb-6">
+                <div className="flex space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => router.push(`/influencers/${influencer.id}`)}
+                  >
+                    <Eye className="w-4 h-4 mr-1" />
+                    프로필 보기
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="flex-1 bg-purple-600 hover:bg-purple-700"
+                  >
+                    <MessageCircle className="w-4 h-4 mr-1" />
+                    연락하기
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* 빈 상태 */}
+        {filteredInfluencers.length === 0 && !loading && (
+          <div className="text-center py-12">
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Users className="w-12 h-12 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">인플루언서를 찾을 수 없습니다</h3>
+            <p className="text-gray-600 mb-4">
+              검색 조건을 변경하거나 다른 필터를 시도해보세요.
             </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
-                1
-              </div>
-              <h3 className="text-xl font-semibold mb-2">프로필 등록</h3>
-              <p className="text-gray-300">간단한 정보 입력으로 프로필을 완성하세요</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
-                2
-              </div>
-              <h3 className="text-xl font-semibold mb-2">AI 매칭</h3>
-              <p className="text-gray-300">AI가 최적의 브랜드를 찾아 매칭해드립니다</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
-                3
-              </div>
-              <h3 className="text-xl font-semibold mb-2">수익 창출</h3>
-              <p className="text-gray-300">브랜드와 협업하여 수익을 만들어보세요</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* CTA Section */}
-      <div className="py-20 bg-purple-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            지금 바로 시작하세요
-          </h2>
-          <p className="text-xl mb-8 text-purple-100">
-            한국 브랜드와 연결되어 새로운 수익 창출 기회를 만들어보세요
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={() => router.push('/auth/register/influencer')}
-              className="bg-white text-purple-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors"
+            <Button
+              onClick={() => {
+                setSearchTerm('')
+                setSelectedCategory('')
+                setSelectedLocation('')
+                setMinFollowers('')
+              }}
+              variant="outline"
             >
-              무료로 등록하기
-            </button>
-            <button
-              onClick={() => router.push('/guide')}
-              className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-purple-600 transition-colors"
-            >
-              가이드 보기
-            </button>
+              필터 초기화
+            </Button>
           </div>
-        </div>
+        )}
       </div>
     </div>
   )

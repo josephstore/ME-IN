@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useSupabaseAuth } from '@/lib/SupabaseAuthContext';
+import { useSimpleAuth } from '@/lib/SimpleAuthContext';
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -17,7 +17,7 @@ const RegisterPage = () => {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   
-  const { signUp } = useSupabaseAuth();
+  const { register } = useSimpleAuth();
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -48,20 +48,15 @@ const RegisterPage = () => {
     }
 
     try {
-      const { error } = await signUp(formData.email, formData.password, {
-        name: formData.name,
-        user_type: formData.userType,
-        language: ['ko', 'en'],
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
-      });
+      const result = await register(formData.email, formData.password, formData.name, formData.userType);
       
-      if (error) {
-        setError(error.message);
-      } else {
-        setMessage('회원가입이 완료되었습니다! 이메일을 확인해주세요.');
+      if (result.success) {
+        setMessage('회원가입이 완료되었습니다! 자동으로 로그인됩니다.');
         setTimeout(() => {
-          router.push('/auth/login');
-        }, 3000);
+          router.push('/');
+        }, 2000);
+      } else {
+        setError(result.error || '회원가입에 실패했습니다.');
       }
     } catch (err) {
       setError('회원가입 중 오류가 발생했습니다.');

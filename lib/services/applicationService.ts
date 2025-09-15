@@ -51,7 +51,8 @@ export class ApplicationService {
           proposal: data.proposal,
           proposed_budget: data.proposed_budget,
           proposed_timeline: data.proposed_timeline,
-          portfolio_links: data.portfolio_links || []
+          portfolio_links: data.portfolio_links || [],
+          status: 'approved' // 자동 승인
         })
         .select()
         .single()

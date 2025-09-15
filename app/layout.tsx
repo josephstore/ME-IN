@@ -3,7 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { Toaster } from '@/components/ui/Toaster'
 import { LanguageProvider } from '@/lib/LanguageContext'
-import { SupabaseAuthProvider } from '@/lib/SupabaseAuthContext'
+import { SimpleAuthProvider } from '@/lib/SimpleAuthContext'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -29,10 +29,10 @@ export default function RootLayout({
     <html lang="ko">
       <body className={inter.className}>
         <LanguageProvider>
-          <SupabaseAuthProvider>
+          <SimpleAuthProvider>
             {children}
             <Toaster />
-          </SupabaseAuthProvider>
+          </SimpleAuthProvider>
         </LanguageProvider>
       </body>
     </html>

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { CampaignService } from '@/lib/services/campaignService'
 import { ProfileService } from '@/lib/services/profileService'
 import { CreateCampaignRequest } from '@/lib/types/database'
-import { supabase } from '@/lib/supabase'
+import { useSimpleAuth } from '@/lib/SimpleAuthContext'
 import { Button } from '@/components/ui/Button'
 import { 
   ArrowLeft, 
@@ -24,7 +24,7 @@ export default function CreateCampaignPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [user, setUser] = useState<any>(null)
+  const { user, isAuthenticated } = useSimpleAuth()
   const [hasBrandProfile, setHasBrandProfile] = useState(false)
 
   // 폼 데이터
@@ -62,20 +62,17 @@ export default function CreateCampaignPage() {
   }, [])
 
   const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      router.push('/auth/login')
+    if (!isAuthenticated) {
+      router.push('/auth/login?redirect=/campaigns/create')
       return
     }
-    setUser(user)
     
-    // 브랜드 프로필 확인
-    const profileResponse = await ProfileService.getCompleteProfile()
-    if (profileResponse.success && profileResponse.data?.brandProfile) {
-      setHasBrandProfile(true)
-    } else {
-      router.push('/profile?message=브랜드 프로필을 먼저 생성해주세요.')
+    if (user?.user_type !== 'brand') {
+      router.push('/?message=브랜드 계정으로 로그인해주세요.')
+      return
     }
+    
+    setHasBrandProfile(true) // 간단한 인증에서는 항상 브랜드 프로필이 있다고 가정
   }
 
   const handleInputChange = (field: keyof CreateCampaignRequest, value: any) => {
@@ -125,12 +122,31 @@ export default function CreateCampaignPage() {
         return
       }
 
-      // 파일 업로드 처리 (실제 구현에서는 Supabase Storage 사용)
+      // 파일 업로드 처리
       const uploadedUrls: string[] = []
       for (const file of tempData.media_files) {
-        // 여기서 실제 파일 업로드 로직 구현
-        // const url = await uploadFile(file)
-        // uploadedUrls.push(url)
+        try {
+          const fileExt = file.name.split('.').pop()
+          const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
+          const filePath = `campaigns/${fileName}`
+
+          const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('campaign-images')
+            .upload(filePath, file)
+
+          if (uploadError) {
+            console.error('파일 업로드 오류:', uploadError)
+            continue
+          }
+
+          const { data: { publicUrl } } = supabase.storage
+            .from('campaign-images')
+            .getPublicUrl(filePath)
+
+          uploadedUrls.push(publicUrl)
+        } catch (error) {
+          console.error('파일 업로드 중 오류:', error)
+        }
       }
 
       const campaignData = {
@@ -140,12 +156,13 @@ export default function CreateCampaignPage() {
 
       const response = await CampaignService.createCampaign(campaignData)
       
-      if (response.success) {
+      if (response.success && response.data) {
         alert('캠페인이 성공적으로 생성되었습니다!')
-        router.push(`/campaigns/${response.data?.id}`)
+        router.push(`/campaigns/${response.data.id}`)
       } else {
         alert(`캠페인 생성 실패: ${response.error}`)
       }
+      
     } catch (error) {
       console.error('캠페인 생성 오류:', error)
       alert('캠페인 생성 중 오류가 발생했습니다.')

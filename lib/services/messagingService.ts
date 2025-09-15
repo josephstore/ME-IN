@@ -1,447 +1,452 @@
-import { supabase } from '../supabase'
-import {
-  Message,
-  Notification,
-  ApiResponse
-} from '../types/database'
+/**
+ * ME-IN 실시간 메시징 서비스
+ * 브랜드와 인플루언서 간의 실시간 채팅 기능
+ */
+
+import { supabase } from '@/lib/supabase'
+
+export interface Message {
+  id: string
+  sender_id: string
+  receiver_id: string
+  campaign_id: string
+  content: string
+  message_type: 'text' | 'image' | 'file' | 'system'
+  attachments: string[]
+  read_at: string | null
+  created_at: string
+}
+
+export interface ChatRoom {
+  id: string
+  campaign_id: string
+  brand_id: string
+  influencer_id: string
+  last_message: Message | null
+  unread_count: number
+  created_at: string
+}
+
+export interface User {
+  id: string
+  name: string
+  avatar: string
+  type: 'brand' | 'influencer'
+}
 
 export class MessagingService {
-  // 메시지 전송
-  static async sendMessage(data: {
-    receiver_id: string
-    application_id?: string
-    content: string
-    message_type: 'text' | 'file' | 'image'
-    file_url?: string
-  }): Promise<ApiResponse<Message>> {
+  /**
+   * 채팅방 목록 조회
+   */
+  static async getChatRooms(userId: string): Promise<ChatRoom[]> {
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        return { data: null, error: '사용자가 인증되지 않았습니다.', success: false }
-      }
+      const { data, error } = await supabase
+        .from('messages')
+        .select(`
+          campaign_id,
+          sender_id,
+          receiver_id,
+          content,
+          message_type,
+          created_at,
+          read_at,
+          campaigns!inner(
+            id,
+            title,
+            brand_profiles!inner(
+              id,
+              company_name,
+              user_id
+            )
+          )
+        `)
+        .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
+        .order('created_at', { ascending: false })
 
-      const { data: message, error } = await supabase
+      if (error) throw error
+
+      // 채팅방별로 그룹화
+      const chatRoomsMap = new Map<string, ChatRoom>()
+      
+      data?.forEach((message: any) => {
+        const campaignId = message.campaign_id
+        const isSender = message.sender_id === userId
+        const otherUserId = isSender ? message.receiver_id : message.sender_id
+
+        if (!chatRoomsMap.has(campaignId)) {
+          chatRoomsMap.set(campaignId, {
+            id: campaignId,
+            campaign_id: campaignId,
+            brand_id: message.campaigns.brand_profiles.user_id,
+            influencer_id: otherUserId,
+            last_message: {
+              id: message.id,
+              sender_id: message.sender_id,
+              receiver_id: message.receiver_id,
+              campaign_id: message.campaign_id,
+              content: message.content,
+              message_type: message.message_type,
+              attachments: [],
+              read_at: message.read_at,
+              created_at: message.created_at
+            },
+            unread_count: 0,
+            created_at: message.created_at
+          })
+        }
+      })
+
+      return Array.from(chatRoomsMap.values())
+    } catch (error) {
+      console.error('Error fetching chat rooms:', error)
+      return []
+    }
+  }
+
+  /**
+   * 특정 채팅방의 메시지 조회
+   */
+  static async getMessages(
+    campaignId: string,
+    userId: string,
+    limit: number = 50,
+    offset: number = 0
+  ): Promise<Message[]> {
+    try {
+      const { data, error } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('campaign_id', campaignId)
+        .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
+        .order('created_at', { ascending: false })
+        .range(offset, offset + limit - 1)
+
+      if (error) throw error
+
+      return data || []
+    } catch (error) {
+      console.error('Error fetching messages:', error)
+      return []
+    }
+  }
+
+  /**
+   * 메시지 전송
+   */
+  static async sendMessage(
+    senderId: string,
+    receiverId: string,
+    campaignId: string,
+    content: string,
+    messageType: 'text' | 'image' | 'file' = 'text',
+    attachments: string[] = []
+  ): Promise<Message | null> {
+    try {
+      const { data, error } = await supabase
         .from('messages')
         .insert({
-          sender_id: user.id,
-          receiver_id: data.receiver_id,
-          application_id: data.application_id,
-          content: data.content,
-          message_type: data.message_type,
-          file_url: data.file_url,
-          is_read: false
+          sender_id: senderId,
+          receiver_id: receiverId,
+          campaign_id: campaignId,
+          content,
+          message_type: messageType,
+          attachments
         })
         .select()
         .single()
 
-      if (error) {
-        return { data: null, error: error.message, success: false }
-      }
+      if (error) throw error
 
-      // 알림 생성
-      await this.createNotification({
-        user_id: data.receiver_id,
-        title: '새 메시지',
-        message: `새로운 메시지가 도착했습니다.`,
-        type: 'message',
-        reference_id: message.id,
-        reference_type: 'message'
-      })
+      // 실시간 업데이트를 위한 알림 생성
+      await this.createNotification(
+        receiverId,
+        'message',
+        '새로운 메시지',
+        content,
+        { campaign_id: campaignId, sender_id: senderId }
+      )
 
-      return { data: message, error: null, success: true }
+      return data
     } catch (error) {
-      return { data: null, error: '메시지 전송 중 오류가 발생했습니다.', success: false }
+      console.error('Error sending message:', error)
+      return null
     }
   }
 
-  // 대화 목록 조회
-  static async getConversations(): Promise<ApiResponse<{
-    conversation_id: string
-    other_user: any
-    last_message: Message
-    unread_count: number
-  }[]>> {
+  /**
+   * 메시지 읽음 처리
+   */
+  static async markAsRead(messageId: string, userId: string): Promise<boolean> {
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        return { data: null, error: '사용자가 인증되지 않았습니다.', success: false }
-      }
-
-      // 보낸 메시지와 받은 메시지를 모두 조회
-      const { data: sentMessages } = await supabase
+      const { error } = await supabase
         .from('messages')
-        .select('*')
-        .eq('sender_id', user.id)
-        .order('created_at', { ascending: false })
+        .update({ read_at: new Date().toISOString() })
+        .eq('id', messageId)
+        .eq('receiver_id', userId)
 
-      const { data: receivedMessages } = await supabase
-        .from('messages')
-        .select('*')
-        .eq('receiver_id', user.id)
-        .order('created_at', { ascending: false })
-
-      // 대화 상대별로 그룹화
-      const conversations = new Map()
-
-      // 보낸 메시지 처리
-      sentMessages?.forEach(message => {
-        const conversationId = message.receiver_id
-        if (!conversations.has(conversationId)) {
-          conversations.set(conversationId, {
-            conversation_id: conversationId,
-            last_message: message,
-            unread_count: 0
-          })
-        }
-      })
-
-      // 받은 메시지 처리
-      receivedMessages?.forEach(message => {
-        const conversationId = message.sender_id
-        if (!conversations.has(conversationId)) {
-          conversations.set(conversationId, {
-            conversation_id: conversationId,
-            last_message: message,
-            unread_count: message.is_read ? 0 : 1
-          })
-        } else {
-          const conversation = conversations.get(conversationId)
-          if (message.created_at > conversation.last_message.created_at) {
-            conversation.last_message = message
-          }
-          if (!message.is_read) {
-            conversation.unread_count += 1
-          }
-        }
-      })
-
-      // 사용자 정보 조회
-      const conversationList = Array.from(conversations.values())
-      for (const conversation of conversationList) {
-        const { data: otherUser } = await supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('user_id', conversation.conversation_id)
-          .single()
-        
-        conversation.other_user = otherUser
-      }
-
-      return { 
-        data: conversationList.sort((a, b) => 
-          new Date(b.last_message.created_at).getTime() - new Date(a.last_message.created_at).getTime()
-        ), 
-        error: null, 
-        success: true 
-      }
+      if (error) throw error
+      return true
     } catch (error) {
-      return { data: null, error: '대화 목록 조회 중 오류가 발생했습니다.', success: false }
+      console.error('Error marking message as read:', error)
+      return false
     }
   }
 
-  // 특정 대화의 메시지 조회
-  static async getMessages(conversationId: string): Promise<ApiResponse<Message[]>> {
+  /**
+   * 채팅방의 모든 메시지 읽음 처리
+   */
+  static async markAllAsRead(campaignId: string, userId: string): Promise<boolean> {
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        return { data: null, error: '사용자가 인증되지 않았습니다.', success: false }
-      }
-
-      const { data: messages, error } = await supabase
+      const { error } = await supabase
         .from('messages')
-        .select('*')
-        .or(`and(sender_id.eq.${user.id},receiver_id.eq.${conversationId}),and(sender_id.eq.${conversationId},receiver_id.eq.${user.id})`)
-        .order('created_at', { ascending: true })
+        .update({ read_at: new Date().toISOString() })
+        .eq('campaign_id', campaignId)
+        .eq('receiver_id', userId)
+        .is('read_at', null)
 
-      if (error) {
-        return { data: null, error: error.message, success: false }
-      }
-
-      // 읽지 않은 메시지를 읽음으로 표시
-      const unreadMessages = messages?.filter(msg => 
-        msg.receiver_id === user.id && !msg.is_read
-      ) || []
-
-      if (unreadMessages.length > 0) {
-        await supabase
-          .from('messages')
-          .update({ is_read: true })
-          .in('id', unreadMessages.map(msg => msg.id))
-      }
-
-      return { data: messages, error: null, success: true }
+      if (error) throw error
+      return true
     } catch (error) {
-      return { data: null, error: '메시지 조회 중 오류가 발생했습니다.', success: false }
+      console.error('Error marking all messages as read:', error)
+      return false
     }
   }
 
-  // 애플리케이션 관련 메시지 조회
-  static async getApplicationMessages(applicationId: string): Promise<ApiResponse<Message[]>> {
+  /**
+   * 파일 업로드
+   */
+  static async uploadFile(
+    file: File,
+    campaignId: string,
+    userId: string
+  ): Promise<string | null> {
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        return { data: null, error: '사용자가 인증되지 않았습니다.', success: false }
-      }
-
-      // 애플리케이션 권한 확인
-      const { data: application, error: appError } = await supabase
-        .from('applications')
-        .select('*')
-        .eq('id', applicationId)
-        .single()
-
-      if (appError) {
-        return { data: null, error: '애플리케이션을 찾을 수 없습니다.', success: false }
-      }
-
-      // 권한 확인 (인플루언서 또는 브랜드)
-      const { data: userProfile } = await supabase
-        .from('user_profiles')
-        .select('user_type')
-        .eq('user_id', user.id)
-        .single()
-
-      if (userProfile?.user_type === 'influencer') {
-        // 인플루언서는 자신의 애플리케이션만 볼 수 있음
-        if (application.influencer_profile_id !== user.id) {
-          return { data: null, error: '이 애플리케이션에 접근할 권한이 없습니다.', success: false }
-        }
-      } else if (userProfile?.user_type === 'brand') {
-        // 브랜드는 자신의 캠페인 애플리케이션만 볼 수 있음
-        const { data: campaign } = await supabase
-          .from('campaigns')
-          .select('brand_profile_id')
-          .eq('id', application.campaign_id)
-          .single()
-
-        if (campaign?.brand_profile_id !== user.id) {
-          return { data: null, error: '이 애플리케이션에 접근할 권한이 없습니다.', success: false }
-        }
-      }
-
-      const { data: messages, error } = await supabase
-        .from('messages')
-        .select('*')
-        .eq('application_id', applicationId)
-        .order('created_at', { ascending: true })
-
-      if (error) {
-        return { data: null, error: error.message, success: false }
-      }
-
-      return { data: messages, error: null, success: true }
-    } catch (error) {
-      return { data: null, error: '애플리케이션 메시지 조회 중 오류가 발생했습니다.', success: false }
-    }
-  }
-
-  // 파일 업로드
-  static async uploadFile(file: File): Promise<ApiResponse<string>> {
-    try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        return { data: null, error: '사용자가 인증되지 않았습니다.', success: false }
-      }
-
-      const fileName = `${Date.now()}_${file.name}`
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${campaignId}/${userId}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
       
-      const { error } = await supabase.storage
-        .from('message-files')
-        .upload(fileName, file, {
-          cacheControl: '3600',
-          upsert: false
-        })
+      const { data, error } = await supabase.storage
+        .from('chat-files')
+        .upload(fileName, file)
 
-      if (error) {
-        return { data: null, error: error.message, success: false }
-      }
+      if (error) throw error
 
-      const { data: urlData } = supabase.storage
-        .from('message-files')
+      const { data: { publicUrl } } = supabase.storage
+        .from('chat-files')
         .getPublicUrl(fileName)
 
-      return { data: urlData.publicUrl, error: null, success: true }
+      return publicUrl
     } catch (error) {
-      return { data: null, error: '파일 업로드 중 오류가 발생했습니다.', success: false }
+      console.error('Error uploading file:', error)
+      return null
     }
   }
 
-  // 알림 생성
-  static async createNotification(data: {
-    user_id: string
-    title: string
-    message: string
-    type: string
-    reference_id?: string
-    reference_type?: string
-  }): Promise<ApiResponse<Notification>> {
+  /**
+   * 실시간 메시지 구독
+   */
+  static subscribeToMessages(
+    campaignId: string,
+    userId: string,
+    onMessage: (message: Message) => void
+  ) {
+    return supabase
+      .channel(`messages:${campaignId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `campaign_id=eq.${campaignId}`
+        },
+        (payload) => {
+          const message = payload.new as Message
+          if (message.sender_id !== userId) {
+            onMessage(message)
+          }
+        }
+      )
+      .subscribe()
+  }
+
+  /**
+   * 실시간 채팅방 업데이트 구독
+   */
+  static subscribeToChatRooms(
+    userId: string,
+    onUpdate: (chatRoom: ChatRoom) => void
+  ) {
+    return supabase
+      .channel(`chat_rooms:${userId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'messages',
+          filter: `or(sender_id.eq.${userId},receiver_id.eq.${userId})`
+        },
+        async (payload) => {
+          // 채팅방 정보 업데이트
+          const message = payload.new as Message
+          const chatRoom = await this.getChatRoomByCampaign(message.campaign_id, userId)
+          if (chatRoom) {
+            onUpdate(chatRoom)
+          }
+        }
+      )
+      .subscribe()
+  }
+
+  /**
+   * 특정 캠페인의 채팅방 정보 조회
+   */
+  private static async getChatRoomByCampaign(
+    campaignId: string,
+    userId: string
+  ): Promise<ChatRoom | null> {
     try {
-      const { data: notification, error } = await supabase
+      const { data, error } = await supabase
+        .from('messages')
+        .select(`
+          campaign_id,
+          sender_id,
+          receiver_id,
+          content,
+          message_type,
+          created_at,
+          read_at
+        `)
+        .eq('campaign_id', campaignId)
+        .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single()
+
+      if (error) throw error
+
+      const isSender = data.sender_id === userId
+      const otherUserId = isSender ? data.receiver_id : data.sender_id
+
+      return {
+        id: campaignId,
+        campaign_id: campaignId,
+        brand_id: otherUserId, // 실제로는 캠페인에서 브랜드 ID를 가져와야 함
+        influencer_id: otherUserId,
+        last_message: {
+          id: data.id,
+          sender_id: data.sender_id,
+          receiver_id: data.receiver_id,
+          campaign_id: data.campaign_id,
+          content: data.content,
+          message_type: data.message_type,
+          attachments: [],
+          read_at: data.read_at,
+          created_at: data.created_at
+        },
+        unread_count: 0,
+        created_at: data.created_at
+      }
+    } catch (error) {
+      console.error('Error fetching chat room:', error)
+      return null
+    }
+  }
+
+  /**
+   * 알림 생성
+   */
+  private static async createNotification(
+    userId: string,
+    type: string,
+    title: string,
+    message: string,
+    data: any = {}
+  ): Promise<void> {
+    try {
+      await supabase
         .from('notifications')
         .insert({
-          ...data,
-          is_read: false
+          user_id: userId,
+          type,
+          title,
+          message,
+          data
         })
-        .select()
+    } catch (error) {
+      console.error('Error creating notification:', error)
+    }
+  }
+
+  /**
+   * 사용자 정보 조회
+   */
+  static async getUserInfo(userId: string): Promise<User | null> {
+    try {
+      // 브랜드 프로필에서 조회
+      const { data: brandData } = await supabase
+        .from('brand_profiles')
+        .select('company_name, user_id')
+        .eq('user_id', userId)
         .single()
 
-      if (error) {
-        return { data: null, error: error.message, success: false }
+      if (brandData) {
+        return {
+          id: userId,
+          name: brandData.company_name,
+          avatar: '/images/logo-arabic.png',
+          type: 'brand'
+        }
       }
 
-      return { data: notification, error: null, success: true }
-    } catch (error) {
-      return { data: null, error: '알림 생성 중 오류가 발생했습니다.', success: false }
-    }
-  }
-
-  // 알림 목록 조회
-  static async getNotifications(): Promise<ApiResponse<Notification[]>> {
-    try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        return { data: null, error: '사용자가 인증되지 않았습니다.', success: false }
-      }
-
-      const { data: notifications, error } = await supabase
-        .from('notifications')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-
-      if (error) {
-        return { data: null, error: error.message, success: false }
-      }
-
-      return { data: notifications, error: null, success: true }
-    } catch (error) {
-      return { data: null, error: '알림 조회 중 오류가 발생했습니다.', success: false }
-    }
-  }
-
-  // 알림 읽음 처리
-  static async markNotificationAsRead(notificationId: string): Promise<ApiResponse<Notification>> {
-    try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        return { data: null, error: '사용자가 인증되지 않았습니다.', success: false }
-      }
-
-      const { data: notification, error } = await supabase
-        .from('notifications')
-        .update({ is_read: true })
-        .eq('id', notificationId)
-        .eq('user_id', user.id)
-        .select()
+      // 인플루언서 프로필에서 조회
+      const { data: influencerData } = await supabase
+        .from('influencer_profiles')
+        .select('display_name, avatar_url, user_id')
+        .eq('user_id', userId)
         .single()
 
-      if (error) {
-        return { data: null, error: error.message, success: false }
+      if (influencerData) {
+        return {
+          id: userId,
+          name: influencerData.display_name,
+          avatar: influencerData.avatar_url || '/images/avatar.jpg',
+          type: 'influencer'
+        }
       }
 
-      return { data: notification, error: null, success: true }
+      return null
     } catch (error) {
-      return { data: null, error: '알림 읽음 처리 중 오류가 발생했습니다.', success: false }
+      console.error('Error fetching user info:', error)
+      return null
     }
   }
 
-  // 모든 알림 읽음 처리
-  static async markAllNotificationsAsRead(): Promise<ApiResponse<null>> {
+  /**
+   * 채팅방 생성 (캠페인 신청 시)
+   */
+  static async createChatRoom(
+    campaignId: string,
+    brandId: string,
+    influencerId: string
+  ): Promise<boolean> {
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        return { data: null, error: '사용자가 인증되지 않았습니다.', success: false }
-      }
-
+      // 첫 메시지로 채팅방 생성
       const { error } = await supabase
-        .from('notifications')
-        .update({ is_read: true })
-        .eq('user_id', user.id)
-        .eq('is_read', false)
-
-      if (error) {
-        return { data: null, error: error.message, success: false }
-      }
-
-      return { data: null, error: null, success: true }
-    } catch (error) {
-      return { data: null, error: '알림 읽음 처리 중 오류가 발생했습니다.', success: false }
-    }
-  }
-
-  // 읽지 않은 알림 수 조회
-  static async getUnreadNotificationCount(): Promise<ApiResponse<number>> {
-    try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        return { data: null, error: '사용자가 인증되지 않았습니다.', success: false }
-      }
-
-      const { count, error } = await supabase
-        .from('notifications')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .eq('is_read', false)
-
-      if (error) {
-        return { data: null, error: error.message, success: false }
-      }
-
-      return { data: count || 0, error: null, success: true }
-    } catch (error) {
-      return { data: null, error: '알림 수 조회 중 오류가 발생했습니다.', success: false }
-    }
-  }
-
-  // 읽지 않은 메시지 수 조회
-  static async getUnreadMessageCount(): Promise<ApiResponse<number>> {
-    try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        return { data: null, error: '사용자가 인증되지 않았습니다.', success: false }
-      }
-
-      const { count, error } = await supabase
         .from('messages')
-        .select('*', { count: 'exact', head: true })
-        .eq('receiver_id', user.id)
-        .eq('is_read', false)
+        .insert({
+          sender_id: brandId,
+          receiver_id: influencerId,
+          campaign_id: campaignId,
+          content: '캠페인에 대한 협업을 시작합니다!',
+          message_type: 'system'
+        })
 
-      if (error) {
-        return { data: null, error: error.message, success: false }
-      }
-
-      return { data: count || 0, error: null, success: true }
+      if (error) throw error
+      return true
     } catch (error) {
-      return { data: null, error: '메시지 수 조회 중 오류가 발생했습니다.', success: false }
+      console.error('Error creating chat room:', error)
+      return false
     }
-  }
-
-  // 실시간 구독 설정
-  static subscribeToMessages(callback: (message: Message) => void) {
-    return supabase
-      .channel('messages')
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'messages'
-      }, (payload) => {
-        callback(payload.new as Message)
-      })
-      .subscribe()
-  }
-
-  // 실시간 알림 구독 설정
-  static subscribeToNotifications(callback: (notification: Notification) => void) {
-    return supabase
-      .channel('notifications')
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'notifications'
-      }, (payload) => {
-        callback(payload.new as Notification)
-      })
-      .subscribe()
   }
 }
