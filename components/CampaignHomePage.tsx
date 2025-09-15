@@ -1,8 +1,8 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Search, Filter, Bell, X, MessageCircle, Calendar, Heart, User, Plus } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { Search, Filter, Bell, X, MessageCircle, Calendar, Heart, User, Plus, CheckCircle } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useSimpleAuth } from '@/lib/SimpleAuthContext'
 import { CampaignService } from '@/lib/services/databaseService'
 import BottomNavigation from './layout/BottomNavigation'
@@ -74,17 +74,49 @@ const defaultCampaigns: Campaign[] = [
 
 export default function CampaignHomePage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { isAuthenticated } = useSimpleAuth()
   const [searchQuery, setSearchQuery] = useState('')
   const [activeFilters, setActiveFilters] = useState<string[]>(['Food', 'Entertainment', 'Beauty', 'Travel', 'Technology', 'Fashion'])
   const [activeTab, setActiveTab] = useState('search')
   const [campaigns, setCampaigns] = useState<Campaign[]>(defaultCampaigns)
   const [loading, setLoading] = useState(false)
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false)
+  const [successMessageType, setSuccessMessageType] = useState<'campaign' | 'influencer' | null>(null)
 
   // 실제 캠페인 데이터 로드
   useEffect(() => {
     loadCampaigns()
-  }, [])
+    
+    // URL 파라미터 확인하여 성공 메시지 표시
+    if (searchParams.get('campaign_created') === 'true') {
+      setShowSuccessMessage(true)
+      setSuccessMessageType('campaign')
+      // URL에서 파라미터 제거
+      const newUrl = new URL(window.location.href)
+      newUrl.searchParams.delete('campaign_created')
+      window.history.replaceState({}, '', newUrl.toString())
+      
+      // 5초 후 메시지 숨기기
+      setTimeout(() => {
+        setShowSuccessMessage(false)
+        setSuccessMessageType(null)
+      }, 5000)
+    } else if (searchParams.get('influencer_registered') === 'true') {
+      setShowSuccessMessage(true)
+      setSuccessMessageType('influencer')
+      // URL에서 파라미터 제거
+      const newUrl = new URL(window.location.href)
+      newUrl.searchParams.delete('influencer_registered')
+      window.history.replaceState({}, '', newUrl.toString())
+      
+      // 5초 후 메시지 숨기기
+      setTimeout(() => {
+        setShowSuccessMessage(false)
+        setSuccessMessageType(null)
+      }, 5000)
+    }
+  }, [searchParams])
 
   const loadCampaigns = async () => {
     try {
@@ -187,6 +219,38 @@ export default function CampaignHomePage() {
             </button>
           </div>
         </div>
+
+        {/* Success Message */}
+        {showSuccessMessage && (
+          <div className="px-4 pb-3">
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center space-x-3">
+              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-green-800">
+                  {successMessageType === 'campaign' 
+                    ? '캠페인이 성공적으로 생성되었습니다! / تم إنشاء الحملة بنجاح!'
+                    : '인플루언서 등록이 완료되었습니다! / تم تسجيل المؤثر بنجاح!'
+                  }
+                </p>
+                <p className="text-xs text-green-600 mt-1">
+                  {successMessageType === 'campaign'
+                    ? '아래에서 새로 생성된 캠페인을 확인할 수 있습니다.'
+                    : '이제 캠페인에 참여하고 브랜드와 협업할 수 있습니다.'
+                  }
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setShowSuccessMessage(false)
+                  setSuccessMessageType(null)
+                }}
+                className="text-green-400 hover:text-green-600"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Active Filters */}
         {activeFilters.length > 0 && (

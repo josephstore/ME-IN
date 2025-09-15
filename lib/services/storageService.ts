@@ -44,11 +44,13 @@ export class StorageService {
   }
 
   // 캠페인 이미지 업로드
-  static async uploadCampaignImage(file: File, campaignId: string): Promise<StorageUploadResult> {
+  static async uploadCampaignImage(file: File, campaignId?: string): Promise<string | null> {
     try {
       const timestamp = Date.now()
       const fileExt = file.name.split('.').pop()
-      const fileName = `campaign_${campaignId}_${timestamp}.${fileExt}`
+      const fileName = campaignId 
+        ? `campaign_${campaignId}_${timestamp}.${fileExt}`
+        : `campaign_temp_${timestamp}.${fileExt}`
       
       const { data, error } = await supabase.storage
         .from('campaign-images')
@@ -59,23 +61,17 @@ export class StorageService {
 
       if (error) {
         console.error('Campaign image upload error:', error)
-        return { success: false, error: error.message }
+        return null
       }
 
       const { data: publicData } = supabase.storage
         .from('campaign-images')
         .getPublicUrl(fileName)
 
-      return {
-        success: true,
-        url: publicData.publicUrl
-      }
+      return publicData.publicUrl
     } catch (error) {
       console.error('Error in uploadCampaignImage:', error)
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      }
+      return null
     }
   }
 

@@ -239,7 +239,8 @@ export default function InfluencerRegisterPage() {
         }
 
         alert('인플루언서 등록이 완료되었습니다!')
-        router.push('/dashboard/influencers')
+        // 홈화면으로 이동하여 등록 완료 확인
+        router.push('/?influencer_registered=true')
       }
     } catch (error) {
       console.error('Registration error:', error)

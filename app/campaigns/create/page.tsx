@@ -94,11 +94,11 @@ export default function CreateCampaignPage() {
     
     for (const file of files) {
       try {
-        const result = await StorageService.uploadCampaignImage(file, 'temp')
-        if (result.success && result.url) {
-          uploadedUrls.push(result.url)
+        const uploadedUrl = await StorageService.uploadCampaignImage(file)
+        if (uploadedUrl) {
+          uploadedUrls.push(uploadedUrl)
         } else {
-          console.error('File upload failed:', result.error)
+          console.error('File upload failed:', file.name)
         }
       } catch (error) {
         console.error('Error uploading file:', error)
@@ -139,19 +139,18 @@ export default function CreateCampaignPage() {
         return
       }
 
-      // 파일 업로드 처리 (로컬 파일 시스템에 저장)
+      // Supabase Storage를 사용한 파일 업로드 처리
       const uploadedUrls: string[] = []
       if (tempData.media_files.length > 0) {
         for (const file of tempData.media_files) {
           try {
-            // 실제 파일 업로드 로직 (로컬 파일 시스템 또는 클라우드 스토리지)
-            const fileExt = file.name.split('.').pop()
-            const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
-            const filePath = `/uploads/campaigns/${fileName}`
-            
-            // 여기서는 파일 경로만 저장 (실제 업로드는 별도 구현 필요)
-            uploadedUrls.push(filePath)
-            console.log('파일 업로드 준비:', file.name, '->', filePath)
+            const uploadedUrl = await StorageService.uploadCampaignImage(file)
+            if (uploadedUrl) {
+              uploadedUrls.push(uploadedUrl)
+              console.log('파일 업로드 성공:', file.name, '->', uploadedUrl)
+            } else {
+              console.error('파일 업로드 실패:', file.name)
+            }
           } catch (error) {
             console.error('파일 업로드 중 오류:', error)
             // 파일 업로드 실패해도 캠페인 생성은 계속 진행
@@ -169,8 +168,8 @@ export default function CreateCampaignPage() {
       
       if (response && response.success && response.data) {
         alert('캠페인이 성공적으로 생성되었습니다!')
-        // 캠페인 목록 페이지로 이동하여 생성된 캠페인 확인 가능
-        router.push('/campaigns?refresh=true')
+        // 홈화면으로 이동하여 생성된 캠페인 확인 가능
+        router.push('/?campaign_created=true')
       } else {
         const errorMessage = response?.error || '알 수 없는 오류가 발생했습니다.'
         alert(`캠페인 생성 실패: ${errorMessage}`)
