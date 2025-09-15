@@ -21,10 +21,27 @@ export function SimpleAuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // 초기 로드 시 저장된 사용자 정보 확인
-    const currentUser = simpleAuth.getCurrentUser()
-    setUser(currentUser)
-    setIsAuthenticated(!!currentUser)
-    setLoading(false)
+    const initializeAuth = () => {
+      try {
+        const currentUser = simpleAuth.getCurrentUser()
+        console.log('Initializing auth with user:', currentUser)
+        setUser(currentUser)
+        setIsAuthenticated(!!currentUser)
+      } catch (error) {
+        console.error('Auth initialization error:', error)
+        setUser(null)
+        setIsAuthenticated(false)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    // 클라이언트 사이드에서만 실행
+    if (typeof window !== 'undefined') {
+      initializeAuth()
+    } else {
+      setLoading(false)
+    }
   }, [])
 
   const login = async (email: string, password: string) => {
@@ -32,8 +49,11 @@ export function SimpleAuthProvider({ children }: { children: ReactNode }) {
     try {
       const result = await simpleAuth.login(email, password)
       if (result.success) {
-        setUser(simpleAuth.user)
-        setIsAuthenticated(true)
+        // simpleAuth 객체의 상태를 강제로 동기화
+        const currentUser = simpleAuth.getCurrentUser()
+        console.log('Login successful, setting user:', currentUser)
+        setUser(currentUser)
+        setIsAuthenticated(!!currentUser)
       }
       return result
     } finally {
@@ -46,8 +66,11 @@ export function SimpleAuthProvider({ children }: { children: ReactNode }) {
     try {
       const result = await simpleAuth.register(email, password, name, user_type)
       if (result.success) {
-        setUser(simpleAuth.user)
-        setIsAuthenticated(true)
+        // simpleAuth 객체의 상태를 강제로 동기화
+        const currentUser = simpleAuth.getCurrentUser()
+        console.log('Registration successful, setting user:', currentUser)
+        setUser(currentUser)
+        setIsAuthenticated(!!currentUser)
       }
       return result
     } finally {
@@ -57,6 +80,7 @@ export function SimpleAuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     simpleAuth.logout()
+    console.log('User logged out')
     setUser(null)
     setIsAuthenticated(false)
   }

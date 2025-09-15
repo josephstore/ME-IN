@@ -28,9 +28,11 @@ const LoginForm = () => {
       
       if (result.success) {
         setMessage('로그인 성공! 리다이렉트 중...');
+        // 즉시 리다이렉트하여 상태 동기화 문제 방지
         setTimeout(() => {
           router.push(redirectTo);
-        }, 1500);
+          router.refresh(); // 페이지 새로고침으로 상태 동기화
+        }, 1000);
       } else {
         setError(result.error || '로그인에 실패했습니다.');
       }

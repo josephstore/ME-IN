@@ -19,6 +19,10 @@ export interface SimpleAuth {
 // 로컬 스토리지 키
 const AUTH_KEY = 'me-in-auth'
 const USERS_KEY = 'me-in-users'
+const AUTH_EXPIRY_KEY = 'me-in-auth-expiry'
+
+// 세션 만료 시간 (7일)
+const SESSION_DURATION = 7 * 24 * 60 * 60 * 1000 // 7일을 밀리초로
 
 // 사용자 데이터 타입
 interface StoredUser {
@@ -67,7 +71,22 @@ const getCurrentAuth = (): SimpleUser | null => {
   if (typeof window === 'undefined') return null
   try {
     const stored = localStorage.getItem(AUTH_KEY)
-    return stored ? JSON.parse(stored) : null
+    const expiry = localStorage.getItem(AUTH_EXPIRY_KEY)
+    
+    if (!stored || !expiry) return null
+    
+    // 세션 만료 확인
+    const now = Date.now()
+    const expiryTime = parseInt(expiry)
+    
+    if (now > expiryTime) {
+      // 세션이 만료된 경우 정리
+      localStorage.removeItem(AUTH_KEY)
+      localStorage.removeItem(AUTH_EXPIRY_KEY)
+      return null
+    }
+    
+    return JSON.parse(stored)
   } catch {
     return null
   }
@@ -79,8 +98,12 @@ const saveCurrentAuth = (user: SimpleUser | null): void => {
   try {
     if (user) {
       localStorage.setItem(AUTH_KEY, JSON.stringify(user))
+      // 세션 만료 시간 설정 (현재 시간 + 7일)
+      const expiryTime = Date.now() + SESSION_DURATION
+      localStorage.setItem(AUTH_EXPIRY_KEY, expiryTime.toString())
     } else {
       localStorage.removeItem(AUTH_KEY)
+      localStorage.removeItem(AUTH_EXPIRY_KEY)
     }
   } catch (error) {
     console.error('Failed to save auth:', error)
@@ -188,10 +211,30 @@ export const simpleAuth: SimpleAuth = {
 }
 
 // 초기화 시 저장된 사용자 정보 로드
+const initializeAuth = () => {
+  if (typeof window !== 'undefined') {
+    try {
+      const storedUser = getCurrentAuth()
+      if (storedUser) {
+        simpleAuth.user = storedUser
+        simpleAuth.isAuthenticated = true
+        console.log('Auth initialized with stored user:', storedUser)
+      } else {
+        console.log('No stored user found')
+      }
+    } catch (error) {
+      console.error('Failed to initialize auth:', error)
+      simpleAuth.user = null
+      simpleAuth.isAuthenticated = false
+    }
+  }
+}
+
+// DOM이 로드된 후 초기화
 if (typeof window !== 'undefined') {
-  const storedUser = getCurrentAuth()
-  if (storedUser) {
-    simpleAuth.user = storedUser
-    simpleAuth.isAuthenticated = true
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeAuth)
+  } else {
+    initializeAuth()
   }
 }
