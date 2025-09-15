@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { Search, Filter, Bell, X, MessageCircle, Calendar, Heart, User, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useSimpleAuth } from '@/lib/SimpleAuthContext'
+import { RealCampaignService } from '@/lib/services/realDatabaseService'
 import BottomNavigation from './layout/BottomNavigation'
 
 interface Campaign {
@@ -80,10 +81,51 @@ export default function CampaignHomePage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>(defaultCampaigns)
   const [loading, setLoading] = useState(false)
 
-  // 캠페인 데이터 로드 (간단한 인증 시스템에서는 기본 데이터 사용)
+  // 실제 캠페인 데이터 로드
   useEffect(() => {
-    setCampaigns(defaultCampaigns)
+    loadCampaigns()
   }, [])
+
+  const loadCampaigns = async () => {
+    try {
+      setLoading(true)
+      const response = await RealCampaignService.getCampaigns()
+      
+      if (response.success && response.data) {
+        // 실제 데이터를 Campaign 인터페이스에 맞게 변환
+        const convertedCampaigns = response.data.map((campaign: any) => ({
+          id: campaign.id,
+          title: campaign.title,
+          title_kr: campaign.title,
+          description: campaign.description,
+          description_kr: campaign.description,
+          budget_min: campaign.budget_min,
+          budget_max: campaign.budget_max,
+          currency: campaign.currency,
+          category: campaign.category,
+          target_regions: campaign.target_regions,
+          target_languages: campaign.target_languages,
+          start_date: campaign.start_date,
+          end_date: campaign.end_date,
+          application_deadline: campaign.application_deadline,
+          max_applications: campaign.max_applications,
+          status: campaign.status,
+          created_at: campaign.created_at,
+          media_assets: campaign.media_assets
+        }))
+        setCampaigns(convertedCampaigns)
+      } else {
+        // 데이터 로드 실패 시 기본 데이터 사용
+        setCampaigns(defaultCampaigns)
+      }
+    } catch (error) {
+      console.error('캠페인 로드 오류:', error)
+      // 오류 시 기본 데이터 사용
+      setCampaigns(defaultCampaigns)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const removeFilter = (filter: string) => {
     setActiveFilters(activeFilters.filter(f => f !== filter))

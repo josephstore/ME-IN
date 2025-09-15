@@ -4,6 +4,7 @@ import './globals.css'
 import { Toaster } from '@/components/ui/Toaster'
 import { LanguageProvider } from '@/lib/LanguageContext'
 import { SimpleAuthProvider } from '@/lib/SimpleAuthContext'
+import Navigation from '@/components/layout/Navigation'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -30,7 +31,10 @@ export default function RootLayout({
       <body className={inter.className}>
         <LanguageProvider>
           <SimpleAuthProvider>
-            {children}
+            <Navigation />
+            <main>
+              {children}
+            </main>
             <Toaster />
           </SimpleAuthProvider>
         </LanguageProvider>
