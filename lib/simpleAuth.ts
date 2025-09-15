@@ -118,27 +118,34 @@ export const simpleAuth: SimpleAuth = {
   // 로그인
   login: async (email: string, password: string) => {
     try {
-      // 실제 데이터베이스에서 사용자 확인
-      const { RealUserService } = await import('@/lib/services/realDatabaseService')
-      const result = await RealUserService.loginUser(email, password)
-      
-      if (!result.success || !result.data) {
-        return { success: false, error: result.error || '로그인에 실패했습니다.' }
+      // Supabase를 사용한 로그인
+      const { supabase } = await import('@/lib/supabase')
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      })
+
+      if (error) {
+        return { success: false, error: error.message }
       }
 
-      const authUser: SimpleUser = {
-        id: result.data.id,
-        email: result.data.email,
-        name: result.data.name,
-        user_type: result.data.user_type,
-        created_at: result.data.created_at
+      if (data.user) {
+        const authUser: SimpleUser = {
+          id: data.user.id,
+          email: data.user.email || '',
+          name: data.user.user_metadata?.name || data.user.email || '',
+          user_type: data.user.user_metadata?.user_type || 'brand',
+          created_at: data.user.created_at
+        }
+
+        saveCurrentAuth(authUser)
+        simpleAuth.user = authUser
+        simpleAuth.isAuthenticated = true
+
+        return { success: true }
       }
 
-      saveCurrentAuth(authUser)
-      simpleAuth.user = authUser
-      simpleAuth.isAuthenticated = true
-
-      return { success: true }
+      return { success: false, error: '로그인에 실패했습니다.' }
     } catch (error) {
       console.error('로그인 오류:', error)
       return { success: false, error: '로그인 중 오류가 발생했습니다.' }
@@ -148,28 +155,41 @@ export const simpleAuth: SimpleAuth = {
   // 회원가입
   register: async (email: string, password: string, name: string, user_type: 'brand' | 'influencer') => {
     try {
-      // 실제 데이터베이스에 사용자 생성
-      const { RealUserService } = await import('@/lib/services/realDatabaseService')
-      const result = await RealUserService.createUser(email, password, name, user_type)
-      
-      if (!result.success || !result.data) {
-        return { success: false, error: result.error || '회원가입에 실패했습니다.' }
+      // Supabase를 사용한 회원가입
+      const { supabase } = await import('@/lib/supabase')
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name,
+            user_type
+          }
+        }
+      })
+
+      if (error) {
+        return { success: false, error: error.message }
       }
 
-      // 자동 로그인
-      const authUser: SimpleUser = {
-        id: result.data.id,
-        email: result.data.email,
-        name: result.data.name,
-        user_type: result.data.user_type,
-        created_at: new Date().toISOString()
+      if (data.user) {
+        // 자동 로그인
+        const authUser: SimpleUser = {
+          id: data.user.id,
+          email: data.user.email || '',
+          name: name,
+          user_type: user_type,
+          created_at: data.user.created_at
+        }
+
+        saveCurrentAuth(authUser)
+        simpleAuth.user = authUser
+        simpleAuth.isAuthenticated = true
+
+        return { success: true }
       }
 
-      saveCurrentAuth(authUser)
-      simpleAuth.user = authUser
-      simpleAuth.isAuthenticated = true
-
-      return { success: true }
+      return { success: false, error: '회원가입에 실패했습니다.' }
     } catch (error) {
       console.error('회원가입 오류:', error)
       return { success: false, error: '회원가입 중 오류가 발생했습니다.' }

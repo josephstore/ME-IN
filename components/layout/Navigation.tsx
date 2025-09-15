@@ -7,7 +7,7 @@ import { useSimpleAuth } from '@/lib/SimpleAuthContext'
 import { Button } from '@/components/ui/Button'
 import { 
   Home, 
-  Campaign, 
+  Megaphone, 
   Users, 
   User, 
   LogOut,
@@ -25,7 +25,7 @@ export default function Navigation() {
 
   const navigationItems = [
     { name: '홈', href: '/', icon: Home },
-    { name: '캠페인', href: '/campaigns', icon: Campaign },
+    { name: '캠페인', href: '/campaigns', icon: Megaphone },
     { name: '인플루언서', href: '/influencers', icon: Users },
   ]
 

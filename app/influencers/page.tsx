@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button'
 import { 
   Search, 
   Filter, 
+  Plus,
   Users, 
   Globe, 
   Star,
@@ -84,8 +85,8 @@ export default function InfluencersPage() {
       setLoading(true)
       const response = await InfluencerService.getInfluencers()
       
-      if (response && response.success && response.data) {
-        setInfluencers(response.data)
+      if (response && Array.isArray(response)) {
+        setInfluencers(response)
       }
     } catch (error) {
       console.error('인플루언서 로드 오류:', error)

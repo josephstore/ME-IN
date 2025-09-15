@@ -91,9 +91,9 @@ export default function CampaignHomePage() {
       setLoading(true)
       const response = await CampaignService.getCampaigns()
       
-      if (response.success && response.data) {
+      if (response && Array.isArray(response)) {
         // 실제 데이터를 Campaign 인터페이스에 맞게 변환
-        const convertedCampaigns = response.data.map((campaign: any) => ({
+        const convertedCampaigns = response.map((campaign: any) => ({
           id: campaign.id,
           title: campaign.title,
           title_kr: campaign.title,

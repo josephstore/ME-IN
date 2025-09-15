@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { CampaignService } from '@/lib/services/databaseService'
 import { Campaign } from '@/lib/types/database'
@@ -21,7 +21,7 @@ import {
   RefreshCw
 } from 'lucide-react'
 
-export default function CampaignsPage() {
+function CampaignsPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [loading, setLoading] = useState(true)
@@ -84,8 +84,8 @@ export default function CampaignsPage() {
       setLoading(true)
       const response = await CampaignService.getCampaigns()
       
-      if (response && response.success && response.data) {
-        setCampaigns(response.data)
+      if (response && Array.isArray(response)) {
+        setCampaigns(response)
       }
     } catch (error) {
       console.error('캠페인 로드 오류:', error)
@@ -415,5 +415,13 @@ export default function CampaignsPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function CampaignsPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CampaignsPageContent />
+    </Suspense>
   )
 }

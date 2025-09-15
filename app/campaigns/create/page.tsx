@@ -54,7 +54,8 @@ export default function CreateCampaignPage() {
   const [tempData, setTempData] = useState({
     target_languages_text: '',
     target_regions_text: '',
-    media_files: [] as File[]
+    media_files: [] as File[],
+    media_assets: [] as string[]
   })
 
   useEffect(() => {
