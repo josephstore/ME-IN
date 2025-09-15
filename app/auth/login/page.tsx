@@ -65,7 +65,7 @@ const LoginForm = () => {
                   <div className="flex justify-center mb-4">
                     <div className="w-16 h-16 bg-beige-400 rounded-lg flex items-center justify-center overflow-hidden">
                       <img 
-                        src="/images/logo-arabic.png" 
+                        src="/images/me-in-logo.svg" 
                         alt="ME-IN Logo" 
                         className="w-full h-full object-cover"
                         onError={(e) => {

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { CampaignService } from '@/lib/services/databaseService'
+import { StorageService } from '@/lib/services/storageService'
 import { CreateCampaignRequest } from '@/lib/types/database'
 import { useSimpleAuth } from '@/lib/SimpleAuthContext'
 import { Button } from '@/components/ui/Button'
@@ -86,11 +87,27 @@ export default function CreateCampaignPage() {
     handleInputChange(field, array)
   }
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || [])
+    const uploadedUrls: string[] = []
+    
+    for (const file of files) {
+      try {
+        const result = await StorageService.uploadCampaignImage(file, 'temp')
+        if (result.success && result.url) {
+          uploadedUrls.push(result.url)
+        } else {
+          console.error('File upload failed:', result.error)
+        }
+      } catch (error) {
+        console.error('Error uploading file:', error)
+      }
+    }
+    
     setTempData(prev => ({
       ...prev,
-      media_files: [...prev.media_files, ...files]
+      media_files: [...prev.media_files, ...files],
+      media_assets: [...prev.media_assets, ...uploadedUrls]
     }))
   }
 

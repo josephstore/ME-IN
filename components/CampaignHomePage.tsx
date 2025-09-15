@@ -148,7 +148,7 @@ export default function CampaignHomePage() {
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-beige-400 rounded-lg flex items-center justify-center overflow-hidden">
                 <img 
-                  src="/images/logo-arabic.png" 
+                  src="/images/me-in-logo.svg" 
                   alt="ME-IN Logo" 
                   className="w-full h-full object-cover"
                   onError={(e) => {

@@ -49,10 +49,11 @@ export default function Navigation() {
           {/* 로고 */}
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center shadow-md">
-                <span className="text-white font-bold text-lg">م</span>
-              </div>
-              <span className="ml-3 text-xl font-bold text-gray-900">ME-IN</span>
+              <img 
+                src="/images/me-in-logo.svg" 
+                alt="ME-IN Logo" 
+                className="h-10 w-auto"
+              />
             </Link>
           </div>
 
