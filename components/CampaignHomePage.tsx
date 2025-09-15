@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { Search, Filter, Bell, X, MessageCircle, Calendar, Heart, User, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useSimpleAuth } from '@/lib/SimpleAuthContext'
-import { RealCampaignService } from '@/lib/services/realDatabaseService'
+import { CampaignService } from '@/lib/services/databaseService'
 import BottomNavigation from './layout/BottomNavigation'
 
 interface Campaign {
@@ -89,7 +89,7 @@ export default function CampaignHomePage() {
   const loadCampaigns = async () => {
     try {
       setLoading(true)
-      const response = await RealCampaignService.getCampaigns()
+      const response = await CampaignService.getCampaigns()
       
       if (response.success && response.data) {
         // 실제 데이터를 Campaign 인터페이스에 맞게 변환

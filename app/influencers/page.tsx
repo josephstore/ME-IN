@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { RealInfluencerService } from '@/lib/services/realDatabaseService'
+import { InfluencerService } from '@/lib/services/databaseService'
 import { InfluencerProfile } from '@/lib/types/database'
 import { Button } from '@/components/ui/Button'
 import { 
@@ -82,7 +82,7 @@ export default function InfluencersPage() {
   const loadInfluencers = async () => {
     try {
       setLoading(true)
-      const response = await RealInfluencerService.getInfluencers()
+      const response = await InfluencerService.getInfluencers()
       
       if (response && response.success && response.data) {
         setInfluencers(response.data)

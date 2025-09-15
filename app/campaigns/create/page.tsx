@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { RealCampaignService, RealUserService } from '@/lib/services/realDatabaseService'
+import { CampaignService } from '@/lib/services/databaseService'
 import { CreateCampaignRequest } from '@/lib/types/database'
 import { useSimpleAuth } from '@/lib/SimpleAuthContext'
 import { Button } from '@/components/ui/Button'
@@ -146,8 +146,8 @@ export default function CreateCampaignPage() {
         media_assets: uploadedUrls
       }
 
-      // 실제 데이터베이스에 캠페인 생성
-      const response = await RealCampaignService.createCampaign('demo-user', campaignData)
+      // Supabase에 캠페인 생성
+      const response = await CampaignService.createCampaign('demo-user', campaignData)
       
       if (response && response.success && response.data) {
         alert('캠페인이 성공적으로 생성되었습니다!')

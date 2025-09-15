@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { RealCampaignService } from '@/lib/services/realDatabaseService'
+import { CampaignService } from '@/lib/services/databaseService'
 import { Campaign } from '@/lib/types/database'
 import { Button } from '@/components/ui/Button'
 import { 
@@ -82,7 +82,7 @@ export default function CampaignsPage() {
   const loadCampaigns = async () => {
     try {
       setLoading(true)
-      const response = await RealCampaignService.getCampaigns()
+      const response = await CampaignService.getCampaigns()
       
       if (response && response.success && response.data) {
         setCampaigns(response.data)

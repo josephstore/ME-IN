@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { RealCampaignService } from '@/lib/services/realDatabaseService'
+import { CampaignService } from '@/lib/services/databaseService'
 import { Button } from '@/components/ui/Button'
 import { 
   ArrowLeft, 
@@ -61,7 +61,7 @@ export default function CampaignDetailPage() {
   const loadCampaign = async (campaignId: string) => {
     try {
       setLoading(true)
-      const response = await RealCampaignService.getCampaignById(campaignId)
+      const response = await CampaignService.getCampaignById(campaignId)
       
       if (response.success && response.data) {
         setCampaign(response.data)
