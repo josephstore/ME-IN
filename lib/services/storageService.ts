@@ -63,8 +63,7 @@ export class StorageService {
 
       if (error) {
         console.error('Campaign image upload error:', error)
-        // 업로드 실패 시 더미 URL 반환
-        return `https://via.placeholder.com/400x300/FF6B35/FFFFFF?text=${encodeURIComponent(file.name)}`
+        return null
       }
 
       const { data: publicData } = supabase.storage
@@ -75,8 +74,7 @@ export class StorageService {
       return publicData.publicUrl
     } catch (error) {
       console.error('Error in uploadCampaignImage:', error)
-      // 예외 발생 시에도 더미 URL 반환
-      return `https://via.placeholder.com/400x300/FF6B35/FFFFFF?text=${encodeURIComponent(file.name)}`
+      return null
     }
   }
 

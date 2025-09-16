@@ -442,16 +442,10 @@ export class CampaignService {
 
       if (error) {
         console.error('캠페인 생성 오류:', error)
-        // 데이터베이스 오류 시에도 더미 데이터로 성공 처리
         return {
-          success: true,
-          data: {
-            id: `campaign_${Date.now()}`,
-            brand_id: brandId,
-            ...campaignData,
-            created_at: new Date().toISOString()
-          },
-          error: null
+          success: false,
+          data: null,
+          error: error.message
         }
       }
 
@@ -463,16 +457,10 @@ export class CampaignService {
       }
     } catch (error) {
       console.error('캠페인 생성 중 예외 발생:', error)
-      // 예외 발생 시에도 더미 데이터로 성공 처리
       return {
-        success: true,
-        data: {
-          id: `campaign_${Date.now()}`,
-          brand_id: brandId,
-          ...campaignData,
-          created_at: new Date().toISOString()
-        },
-        error: null
+        success: false,
+        data: null,
+        error: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.'
       }
     }
   }

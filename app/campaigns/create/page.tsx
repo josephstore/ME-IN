@@ -142,6 +142,8 @@ export default function CreateCampaignPage() {
 
       // Supabase Storage를 사용한 파일 업로드 처리
       const uploadedUrls: string[] = []
+      const failedUploads: string[] = []
+      
       if (tempData.media_files.length > 0) {
         for (const file of tempData.media_files) {
           try {
@@ -151,11 +153,17 @@ export default function CreateCampaignPage() {
               console.log('파일 업로드 성공:', file.name, '->', uploadedUrl)
             } else {
               console.error('파일 업로드 실패:', file.name)
+              failedUploads.push(file.name)
             }
           } catch (error) {
             console.error('파일 업로드 중 오류:', error)
-            // 파일 업로드 실패해도 캠페인 생성은 계속 진행
+            failedUploads.push(file.name)
           }
+        }
+        
+        // 파일 업로드 실패가 있는 경우 사용자에게 알림
+        if (failedUploads.length > 0) {
+          alert(`다음 파일들의 업로드에 실패했습니다: ${failedUploads.join(', ')}\n캠페인은 생성되지만 이미지 없이 진행됩니다.`)
         }
       }
 

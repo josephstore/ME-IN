@@ -133,6 +133,36 @@ export const simpleAuth: SimpleAuth = {
 
       if (error) {
         console.error('Supabase 로그인 오류:', error)
+        // 네트워크 오류인 경우 재시도
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+          console.log('네트워크 오류 감지, 재시도 중...')
+          // 2초 후 재시도
+          await new Promise(resolve => setTimeout(resolve, 2000))
+          const { data: retryData, error: retryError } = await supabase.auth.signInWithPassword({
+            email,
+            password
+          })
+          
+          if (retryError) {
+            return { success: false, error: '네트워크 연결을 확인해주세요.' }
+          }
+          
+          if (retryData.user) {
+            const authUser: SimpleUser = {
+              id: retryData.user.id,
+              email: retryData.user.email || '',
+              name: retryData.user.user_metadata?.name || retryData.user.email || '',
+              user_type: retryData.user.user_metadata?.user_type || 'brand',
+              created_at: retryData.user.created_at
+            }
+
+            saveCurrentAuth(authUser)
+            simpleAuth.user = authUser
+            simpleAuth.isAuthenticated = true
+
+            return { success: true }
+          }
+        }
         return { success: false, error: error.message }
       }
 

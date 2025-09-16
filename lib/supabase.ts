@@ -24,8 +24,12 @@ export const supabase = (() => {
             ...options,
             headers: {
               ...options.headers,
-              'User-Agent': 'ME-IN-Platform/1.0.0'
-            }
+              'User-Agent': 'ME-IN-Platform/1.0.0',
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            // 네트워크 타임아웃 설정
+            signal: AbortSignal.timeout(10000) // 10초 타임아웃
           })
         }
       }
