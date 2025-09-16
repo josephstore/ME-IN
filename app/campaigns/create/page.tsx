@@ -6,6 +6,7 @@ import { CampaignService } from '@/lib/services/databaseService'
 import { StorageService } from '@/lib/services/storageService'
 import { CreateCampaignRequest } from '@/lib/types/database'
 import { useSimpleAuth } from '@/lib/SimpleAuthContext'
+import { simpleAuth } from '@/lib/simpleAuth'
 import { Button } from '@/components/ui/Button'
 import { 
   ArrowLeft, 
@@ -163,8 +164,10 @@ export default function CreateCampaignPage() {
         media_assets: uploadedUrls
       }
 
-      // Supabase에 캠페인 생성
-      const response = await CampaignService.createCampaign('demo-user', campaignData)
+      // Supabase에 캠페인 생성 (실제 사용자 ID 사용)
+      const currentUser = simpleAuth.getCurrentUser()
+      const userId = currentUser?.id || 'demo-user'
+      const response = await CampaignService.createCampaign(userId, campaignData)
       
       if (response && response.success && response.data) {
         alert('캠페인이 성공적으로 생성되었습니다!')

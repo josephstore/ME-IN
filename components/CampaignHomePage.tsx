@@ -92,6 +92,8 @@ export default function CampaignHomePage() {
     if (searchParams.get('campaign_created') === 'true') {
       setShowSuccessMessage(true)
       setSuccessMessageType('campaign')
+      // 캠페인 생성 후 데이터 새로고침
+      loadCampaigns()
       // URL에서 파라미터 제거
       const newUrl = new URL(window.location.href)
       newUrl.searchParams.delete('campaign_created')
@@ -188,7 +190,12 @@ export default function CampaignHomePage() {
       <div className="bg-white shadow-sm border-b border-beige-200">
         <div className="px-4 py-3">
           <div className="flex items-center justify-between">
-            <div></div>
+            {/* ME-IN 로고 */}
+            <div className="flex items-center">
+              <div className="bg-orange-500 text-white px-4 py-2 rounded-lg font-bold text-lg">
+                ME-IN
+              </div>
+            </div>
           </div>
         </div>
 
