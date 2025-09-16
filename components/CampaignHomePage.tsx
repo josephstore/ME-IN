@@ -176,12 +176,6 @@ export default function CampaignHomePage() {
       <div className="bg-white shadow-sm border-b border-beige-200">
         <div className="px-4 py-3">
           <div className="flex items-center justify-between">
-            {/* Logo */}
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-beige-400 rounded-lg flex items-center justify-center">
-                <span className="text-navy-600 font-bold text-sm">ME-IN</span>
-              </div>
-            </div>
             
             {/* Notifications */}
             <div className="flex items-center space-x-3">
