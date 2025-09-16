@@ -13,6 +13,7 @@ import {
   LogOut,
   Plus,
   Menu,
+  Bell,
   X
 } from 'lucide-react'
 import { useState } from 'react'
@@ -72,6 +73,14 @@ export default function Navigation() {
                 </Link>
               )
             })}
+          </div>
+
+          {/* 알림 아이콘 */}
+          <div className="flex items-center space-x-3">
+            <div className="relative">
+              <Bell className="w-6 h-6 text-navy-600 cursor-pointer hover:text-navy-800 transition-colors" />
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-salmon-500 rounded-full"></div>
+            </div>
           </div>
 
           {/* 사용자 메뉴 */}

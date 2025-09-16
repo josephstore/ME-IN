@@ -77,7 +77,7 @@ export default function CampaignHomePage() {
   const searchParams = useSearchParams()
   const { isAuthenticated } = useSimpleAuth()
   const [searchQuery, setSearchQuery] = useState('')
-  const [activeFilters, setActiveFilters] = useState<string[]>(['Food', 'Entertainment', 'Beauty', 'Travel', 'Technology', 'Fashion'])
+  const [activeFilters, setActiveFilters] = useState<string[]>([])
   const [activeTab, setActiveTab] = useState('search')
   const [campaigns, setCampaigns] = useState<Campaign[]>(defaultCampaigns)
   const [loading, setLoading] = useState(false)
@@ -163,6 +163,18 @@ export default function CampaignHomePage() {
     setActiveFilters(activeFilters.filter(f => f !== filter))
   }
 
+  const addFilter = (filter: string) => {
+    if (!activeFilters.includes(filter)) {
+      setActiveFilters([...activeFilters, filter])
+    }
+  }
+
+  const clearAllFilters = () => {
+    setActiveFilters([])
+  }
+
+  const availableFilters = ['Food', 'Entertainment', 'Beauty', 'Travel', 'Technology', 'Fashion', 'Health', 'Sports', 'Education', 'Gaming']
+
   const filteredCampaigns = campaigns.filter(campaign => {
     const matchesSearch = campaign.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          campaign.title_kr.toLowerCase().includes(searchQuery.toLowerCase())
@@ -176,14 +188,7 @@ export default function CampaignHomePage() {
       <div className="bg-white shadow-sm border-b border-beige-200">
         <div className="px-4 py-3">
           <div className="flex items-center justify-between">
-            
-            {/* Notifications */}
-            <div className="flex items-center space-x-3">
-              <div className="relative">
-                <Bell className="w-6 h-6 text-navy-600" />
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-salmon-500 rounded-full"></div>
-              </div>
-            </div>
+            <div></div>
           </div>
         </div>
 
@@ -236,27 +241,58 @@ export default function CampaignHomePage() {
           </div>
         )}
 
-        {/* Active Filters */}
-        {activeFilters.length > 0 && (
-          <div className="px-4 pb-3">
+        {/* Filter Section */}
+        <div className="px-4 pb-3">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-medium text-navy-600">필터</h3>
+            {activeFilters.length > 0 && (
+              <button
+                onClick={clearAllFilters}
+                className="text-xs text-navy-400 hover:text-navy-600"
+              >
+                모두 지우기
+              </button>
+            )}
+          </div>
+          
+          {/* Available Filters */}
+          <div className="flex flex-wrap gap-2 mb-3">
+            {availableFilters.map(filter => (
+              <button
+                key={filter}
+                onClick={() => activeFilters.includes(filter) ? removeFilter(filter) : addFilter(filter)}
+                className={`px-3 py-1 rounded-full text-sm transition-colors ${
+                  activeFilters.includes(filter)
+                    ? 'bg-navy-600 text-white'
+                    : 'bg-white border border-beige-300 text-navy-600 hover:bg-navy-50'
+                }`}
+              >
+                {filter}
+              </button>
+            ))}
+          </div>
+
+          {/* Active Filters */}
+          {activeFilters.length > 0 && (
             <div className="flex flex-wrap gap-2">
+              <span className="text-xs text-navy-500">선택된 필터:</span>
               {activeFilters.map(filter => (
                 <div
                   key={filter}
-                  className="flex items-center space-x-1 bg-white border border-beige-300 rounded-full px-3 py-1"
+                  className="flex items-center space-x-1 bg-navy-100 border border-navy-200 rounded-full px-3 py-1"
                 >
-                  <span className="text-sm text-navy-600">{filter}</span>
+                  <span className="text-sm text-navy-700">{filter}</span>
                   <button
                     onClick={() => removeFilter(filter)}
-                    className="ml-1"
+                    className="ml-1 hover:bg-navy-200 rounded-full p-0.5"
                   >
-                    <X className="w-3 h-3 text-navy-400" />
+                    <X className="w-3 h-3 text-navy-500" />
                   </button>
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Campaign Cards */}
