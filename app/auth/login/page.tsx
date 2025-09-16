@@ -63,7 +63,9 @@ const LoginForm = () => {
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full mx-4">
                 <div className="text-center mb-8">
                   <div className="flex justify-center mb-4">
-                    <span className="text-navy-600 font-bold text-3xl">ME-IN</span>
+                    <div className="w-16 h-16 bg-beige-400 rounded-lg flex items-center justify-center">
+                      <span className="text-navy-600 font-bold text-2xl">ME-IN</span>
+                    </div>
                   </div>
                   <h1 className="text-3xl font-bold text-navy-600 mb-2">로그인</h1>
                   <p className="text-navy-500">플랫폼에 오신 것을 환영합니다</p>
