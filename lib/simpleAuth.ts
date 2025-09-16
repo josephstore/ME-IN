@@ -256,29 +256,3 @@ if (typeof window !== 'undefined') {
     initializeAuth()
   }
 }
-
-    try {
-      const storedUser = getCurrentAuth()
-      if (storedUser) {
-        simpleAuth.user = storedUser
-        simpleAuth.isAuthenticated = true
-        console.log('Auth initialized with stored user:', storedUser)
-      } else {
-        console.log('No stored user found')
-      }
-    } catch (error) {
-      console.error('Failed to initialize auth:', error)
-      simpleAuth.user = null
-      simpleAuth.isAuthenticated = false
-    }
-  }
-}
-
-// DOM이 로드된 후 초기화
-if (typeof window !== 'undefined') {
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeAuth)
-  } else {
-    initializeAuth()
-  }
-}
