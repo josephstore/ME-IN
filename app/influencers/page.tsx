@@ -219,8 +219,18 @@ export default function InfluencersPage() {
                 브랜드에 최적의 인플루언서를 찾아보세요
               </p>
             </div>
-            <div className="text-sm text-gray-500">
-              총 {filteredInfluencers.length}명의 인플루언서
+            <div className="flex items-center space-x-4">
+              <div className="text-sm text-gray-500">
+                총 {filteredInfluencers.length}명의 인플루언서
+              </div>
+              {/* 캠페인 생성 버튼 - 사용자 경험을 고려한 위치 */}
+              <Button
+                onClick={() => router.push('/campaigns/create')}
+                className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
+              >
+                <Plus className="w-4 h-4" />
+                <span>캠페인 생성</span>
+              </Button>
             </div>
           </div>
         </div>
@@ -444,16 +454,6 @@ export default function InfluencersPage() {
           </div>
         )}
 
-        {/* 플로팅 액션 버튼 - 캠페인 생성 */}
-        <div className="fixed bottom-6 right-6 z-50">
-          <Button
-            onClick={() => router.push('/campaigns/create')}
-            className="bg-orange-600 hover:bg-orange-700 text-white rounded-full w-14 h-14 shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center"
-            title="새 캠페인 생성"
-          >
-            <Plus className="w-6 h-6" />
-          </Button>
-        </div>
       </div>
     </div>
   )
