@@ -125,7 +125,7 @@ export default function CampaignHomePage() {
       setLoading(true)
       const response = await CampaignService.getCampaigns()
       
-      if (response && Array.isArray(response)) {
+      if (response && Array.isArray(response) && response.length > 0) {
         // 실제 데이터를 Campaign 인터페이스에 맞게 변환
         const convertedCampaigns = response.map((campaign: any) => ({
           id: campaign.id,
@@ -186,20 +186,7 @@ export default function CampaignHomePage() {
 
   return (
     <div className="min-h-screen bg-beige-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b border-beige-200">
-        <div className="px-4 py-3">
-          <div className="flex items-center justify-between">
-            {/* ME-IN 로고 */}
-            <div className="flex items-center">
-              <div className="bg-orange-500 text-white px-4 py-2 rounded-lg font-bold text-lg">
-                ME-IN
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Search Bar */}
+      {/* Search Bar */}
         <div className="px-4 pb-3">
           <div className="relative">
             <input

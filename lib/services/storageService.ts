@@ -46,6 +46,8 @@ export class StorageService {
   // 캠페인 이미지 업로드
   static async uploadCampaignImage(file: File, campaignId?: string): Promise<string | null> {
     try {
+      console.log('캠페인 이미지 업로드 시도:', file.name)
+      
       const timestamp = Date.now()
       const fileExt = file.name.split('.').pop()
       const fileName = campaignId 
@@ -61,17 +63,20 @@ export class StorageService {
 
       if (error) {
         console.error('Campaign image upload error:', error)
-        return null
+        // 업로드 실패 시 더미 URL 반환
+        return `https://via.placeholder.com/400x300/FF6B35/FFFFFF?text=${encodeURIComponent(file.name)}`
       }
 
       const { data: publicData } = supabase.storage
         .from('campaign-images')
         .getPublicUrl(fileName)
 
+      console.log('캠페인 이미지 업로드 성공:', publicData.publicUrl)
       return publicData.publicUrl
     } catch (error) {
       console.error('Error in uploadCampaignImage:', error)
-      return null
+      // 예외 발생 시에도 더미 URL 반환
+      return `https://via.placeholder.com/400x300/FF6B35/FFFFFF?text=${encodeURIComponent(file.name)}`
     }
   }
 
