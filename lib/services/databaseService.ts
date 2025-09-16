@@ -239,8 +239,13 @@ export class InfluencerService {
 
     const { data, error } = await query.order('created_at', { ascending: false })
 
-    if (error) throw error
-    return data
+    if (error) {
+      console.error('인플루언서 목록 조회 오류:', error)
+      return []
+    }
+    
+    console.log('인플루언서 목록 조회 성공:', data?.length || 0, '명')
+    return data || []
   }
 
   // 인플루언서 상세 조회
@@ -387,8 +392,13 @@ export class CampaignService {
 
     const { data, error } = await query.order('created_at', { ascending: false })
 
-    if (error) throw error
-    return data
+    if (error) {
+      console.error('캠페인 목록 조회 오류:', error)
+      return []
+    }
+    
+    console.log('캠페인 목록 조회 성공:', data?.length || 0, '개')
+    return data || []
   }
 
   // 캠페인 상세 조회
@@ -419,24 +429,8 @@ export class CampaignService {
   // 캠페인 생성
   static async createCampaign(brandId: string, campaignData: any) {
     try {
-      // Supabase 연결 테스트
-      try {
-        await supabase.from('campaigns').select('id').limit(1)
-      } catch (connectionError) {
-        console.warn('Supabase 연결 실패, 더미 데이터로 처리:', connectionError)
-        // 연결 실패 시 더미 데이터 반환
-        return {
-          success: true,
-          data: {
-            id: `campaign_${Date.now()}`,
-            brand_id: brandId,
-            ...campaignData,
-            created_at: new Date().toISOString()
-          },
-          error: null
-        }
-      }
-
+      console.log('캠페인 생성 시도:', { brandId, campaignData })
+      
       const { data, error } = await supabase
         .from('campaigns')
         .insert({
@@ -448,19 +442,14 @@ export class CampaignService {
 
       if (error) {
         console.error('캠페인 생성 오류:', error)
-        // 데이터베이스 오류 시에도 더미 데이터로 성공 처리
         return {
-          success: true,
-          data: {
-            id: `campaign_${Date.now()}`,
-            brand_id: brandId,
-            ...campaignData,
-            created_at: new Date().toISOString()
-          },
-          error: null
+          success: false,
+          data: null,
+          error: error.message
         }
       }
 
+      console.log('캠페인 생성 성공:', data)
       return {
         success: true,
         data: data,
