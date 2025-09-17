@@ -193,6 +193,8 @@ export const simpleAuth: SimpleAuth = {
   // 회원가입
   register: async (email: string, password: string, name: string, user_type: 'brand' | 'influencer') => {
     try {
+      console.log('회원가입 시도:', email)
+      
       // Supabase를 사용한 회원가입
       const { supabase } = await import('@/lib/supabase')
       const { data, error } = await supabase.auth.signUp({
@@ -207,6 +209,44 @@ export const simpleAuth: SimpleAuth = {
       })
 
       if (error) {
+        console.error('Supabase 회원가입 오류:', error)
+        // 네트워크 오류인 경우 재시도
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+          console.log('네트워크 오류 감지, 재시도 중...')
+          // 2초 후 재시도
+          await new Promise(resolve => setTimeout(resolve, 2000))
+          const { data: retryData, error: retryError } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              data: {
+                name,
+                user_type
+              }
+            }
+          })
+          
+          if (retryError) {
+            return { success: false, error: '네트워크 연결을 확인해주세요.' }
+          }
+          
+          if (retryData.user) {
+            const authUser: SimpleUser = {
+              id: retryData.user.id,
+              email: retryData.user.email || '',
+              name: name,
+              user_type: user_type,
+              created_at: retryData.user.created_at
+            }
+
+            saveCurrentAuth(authUser)
+            simpleAuth.user = authUser
+            simpleAuth.isAuthenticated = true
+
+            console.log('회원가입 성공 (재시도):', email)
+            return { success: true }
+          }
+        }
         return { success: false, error: error.message }
       }
 
@@ -224,13 +264,14 @@ export const simpleAuth: SimpleAuth = {
         simpleAuth.user = authUser
         simpleAuth.isAuthenticated = true
 
+        console.log('회원가입 성공:', email)
         return { success: true }
       }
 
       return { success: false, error: '회원가입에 실패했습니다.' }
     } catch (error) {
       console.error('회원가입 오류:', error)
-      return { success: false, error: '회원가입 중 오류가 발생했습니다.' }
+      return { success: false, error: `회원가입 중 오류가 발생했습니다: ${error instanceof Error ? error.message : '알 수 없는 오류'}` }
     }
   },
 

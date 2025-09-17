@@ -20,6 +20,10 @@ export const supabase = (() => {
       },
       global: {
         fetch: (url, options = {}) => {
+          // 타임아웃 설정을 위한 AbortController
+          const controller = new AbortController()
+          const timeoutId = setTimeout(() => controller.abort(), 10000) // 10초 타임아웃
+          
           return fetch(url, {
             ...options,
             headers: {
@@ -28,8 +32,9 @@ export const supabase = (() => {
               'Accept': 'application/json',
               'Content-Type': 'application/json'
             },
-            // 네트워크 타임아웃 설정
-            signal: AbortSignal.timeout(10000) // 10초 타임아웃
+            signal: controller.signal
+          }).finally(() => {
+            clearTimeout(timeoutId)
           })
         }
       }
@@ -41,20 +46,46 @@ export const supabase = (() => {
 // 연결 테스트 함수
 export const testSupabaseConnection = async () => {
   try {
+    console.log('Supabase 연결 테스트 시작...')
     const { data, error } = await supabase
       .from('campaigns')
       .select('count')
       .limit(1)
-    
+
     if (error) {
       console.error('Supabase 연결 테스트 실패:', error)
       return false
     }
-    
+
     console.log('Supabase 연결 테스트 성공')
     return true
   } catch (error) {
     console.error('Supabase 연결 테스트 오류:', error)
+    return false
+  }
+}
+
+// 네트워크 연결 테스트 함수
+export const testNetworkConnection = async () => {
+  try {
+    console.log('네트워크 연결 테스트 시작...')
+    const response = await fetch('https://jltnvoyjnzlswsmddojf.supabase.co/rest/v1/', {
+      method: 'HEAD',
+      headers: {
+        'apikey': supabaseAnonKey,
+        'Authorization': `Bearer ${supabaseAnonKey}`
+      }
+    })
+    
+    if (response.ok) {
+      console.log('네트워크 연결 테스트 성공')
+      return true
+    } else {
+      console.error('네트워크 연결 테스트 실패:', response.status, response.statusText)
+      return false
+    }
+  } catch (error) {
+    console.error('네트워크 연결 테스트 오류:', error)
     return false
   }
 }
