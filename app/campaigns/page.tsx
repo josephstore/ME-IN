@@ -2,9 +2,10 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { CampaignService } from '@/lib/services/databaseService'
+import { CampaignService } from '@/lib/services/campaignService'
 import { Campaign } from '@/lib/types/database'
 import { Button } from '@/components/ui/Button'
+import { networkService } from '@/lib/services/networkService'
 import { 
   Search, 
   Filter, 
@@ -18,7 +19,10 @@ import {
   Eye,
   MapPin,
   Clock,
-  RefreshCw
+  RefreshCw,
+  Wifi,
+  WifiOff,
+  AlertTriangle
 } from 'lucide-react'
 
 function CampaignsPageContent() {
@@ -32,6 +36,12 @@ function CampaignsPageContent() {
   const [selectedStatus, setSelectedStatus] = useState('')
   const [sortBy, setSortBy] = useState('created_at')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
+  const [networkStatus, setNetworkStatus] = useState({
+    isOnline: true,
+    isSupabaseConnected: true,
+    lastChecked: new Date()
+  })
+  const [networkMessage, setNetworkMessage] = useState('')
 
   const categories = [
     '뷰티/화장품',
@@ -65,6 +75,23 @@ function CampaignsPageContent() {
     }
   }, [searchParams])
 
+  // 네트워크 상태 모니터링
+  useEffect(() => {
+    const unsubscribe = networkService.subscribe((status) => {
+      setNetworkStatus(status)
+      
+      if (!status.isOnline) {
+        setNetworkMessage('인터넷 연결이 끊어졌습니다. 오프라인 모드로 전환됩니다.')
+      } else if (!status.isSupabaseConnected) {
+        setNetworkMessage('서버 연결에 문제가 있습니다. 캐시된 데이터를 표시합니다.')
+      } else {
+        setNetworkMessage('')
+      }
+    })
+
+    return unsubscribe
+  }, [])
+
   // 페이지 포커스 시 데이터 새로고침
   useEffect(() => {
     const handleFocus = () => {
@@ -82,13 +109,22 @@ function CampaignsPageContent() {
   const loadCampaigns = async () => {
     try {
       setLoading(true)
-      const response = await CampaignService.getCampaigns()
+      const response = await CampaignService.getActiveCampaigns()
       
-      if (response && Array.isArray(response)) {
-        setCampaigns(response)
+      if (response?.success && response.data) {
+        setCampaigns(response.data)
+        
+        // 네트워크 메시지 표시
+        if (response.error && response.error.includes('캐시된 데이터')) {
+          setNetworkMessage(response.error)
+        }
+      } else {
+        console.error('캠페인 로드 오류:', response?.error)
+        setNetworkMessage(response?.error || '캠페인을 불러오는데 실패했습니다.')
       }
     } catch (error) {
       console.error('캠페인 로드 오류:', error)
+      setNetworkMessage('캠페인을 불러오는 중 오류가 발생했습니다.')
     } finally {
       setLoading(false)
     }
@@ -199,6 +235,22 @@ function CampaignsPageContent() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* 네트워크 상태 알림 */}
+        {networkMessage && (
+          <div className="mb-4 p-4 rounded-lg border-l-4 border-yellow-400 bg-yellow-50">
+            <div className="flex items-center">
+              {!networkStatus.isOnline ? (
+                <WifiOff className="w-5 h-5 text-yellow-600 mr-2" />
+              ) : !networkStatus.isSupabaseConnected ? (
+                <AlertTriangle className="w-5 h-5 text-yellow-600 mr-2" />
+              ) : (
+                <Wifi className="w-5 h-5 text-green-600 mr-2" />
+              )}
+              <p className="text-yellow-800 text-sm">{networkMessage}</p>
+            </div>
+          </div>
+        )}
+
         {/* 헤더 */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between">

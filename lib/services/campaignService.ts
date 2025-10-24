@@ -1,4 +1,6 @@
 import { supabase } from '../supabase'
+import { networkService } from './networkService'
+import { sampleCampaigns } from '../data/sampleCampaigns'
 import {
   Campaign,
   CreateCampaignRequest,
@@ -127,49 +129,80 @@ export class CampaignService {
     minFollowers?: number
   }): Promise<ApiResponse<Campaign[]>> {
     try {
-      let query = supabase
-        .from('campaigns')
-        .select(`
-          *,
-          brand_profiles (
+      // 네트워크 연결 확인
+      const networkStatus = networkService.getNetworkStatus()
+      if (!networkStatus.isOnline) {
+        // 오프라인 데이터 반환 (샘플 데이터 포함)
+        const offlineData = networkService.getOfflineData('active_campaigns', sampleCampaigns)
+        return { data: offlineData, error: '오프라인 모드: 캐시된 데이터를 표시합니다.', success: true }
+      }
+
+      // 재시도 로직으로 네트워크 요청
+      const result = await networkService.retryWithBackoff(async () => {
+        let query = supabase
+          .from('campaigns')
+          .select(`
             *,
-            user_profiles (
-              display_name,
-              avatar_url
+            brand_profiles (
+              *,
+              user_profiles (
+                display_name,
+                avatar_url
+              )
             )
-          )
-        `)
-        .eq('status', 'active')
-        .order('created_at', { ascending: false })
+          `)
+          .eq('status', 'active')
+          .order('created_at', { ascending: false })
 
-      // 필터 적용
-      if (filters?.category) {
-        query = query.eq('category', filters.category)
-      }
-      if (filters?.minBudget) {
-        query = query.gte('budget_min', filters.minBudget)
-      }
-      if (filters?.maxBudget) {
-        query = query.lte('budget_max', filters.maxBudget)
-      }
-      if (filters?.targetLanguages?.length) {
-        query = query.overlaps('target_languages', filters.targetLanguages)
-      }
-      if (filters?.targetRegions?.length) {
-        query = query.overlaps('target_regions', filters.targetRegions)
-      }
-      if (filters?.minFollowers) {
-        query = query.gte('min_followers', filters.minFollowers)
-      }
+        // 필터 적용
+        if (filters?.category) {
+          query = query.eq('category', filters.category)
+        }
+        if (filters?.minBudget) {
+          query = query.gte('budget_min', filters.minBudget)
+        }
+        if (filters?.maxBudget) {
+          query = query.lte('budget_max', filters.maxBudget)
+        }
+        if (filters?.targetLanguages?.length) {
+          query = query.overlaps('target_languages', filters.targetLanguages)
+        }
+        if (filters?.targetRegions?.length) {
+          query = query.overlaps('target_regions', filters.targetRegions)
+        }
+        if (filters?.minFollowers) {
+          query = query.gte('min_followers', filters.minFollowers)
+        }
 
-      const { data: campaigns, error } = await query
+        const { data: campaigns, error } = await query
 
-      if (error) {
-        return { data: null, error: error.message, success: false }
-      }
+        if (error) {
+          throw error
+        }
 
-      return { data: campaigns, error: null, success: true }
+        return campaigns
+      })
+
+      // 성공 시 오프라인 캐시에 저장
+      networkService.setOfflineData('active_campaigns', result)
+
+      // 샘플 데이터와 병합 (네트워크 데이터가 비어있는 경우)
+      const finalResult = result && result.length > 0 ? result : sampleCampaigns
+
+      return { data: finalResult, error: null, success: true }
     } catch (error) {
+      console.error('캠페인 목록 조회 오류:', error)
+      
+      // 네트워크 오류인 경우 오프라인 데이터 반환 (샘플 데이터 포함)
+      if (networkService.isNetworkError(error)) {
+        const offlineData = networkService.getOfflineData('active_campaigns', sampleCampaigns)
+        return { 
+          data: offlineData, 
+          error: '네트워크 연결 문제로 샘플 데이터를 표시합니다.', 
+          success: true 
+        }
+      }
+
       return { data: null, error: '활성 캠페인 조회 중 오류가 발생했습니다.', success: false }
     }
   }

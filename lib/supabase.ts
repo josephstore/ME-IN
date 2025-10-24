@@ -1,7 +1,14 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://jltnvoyjnzlswsmddojf.supabase.co'
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpsdG52b3lqbnpsc3dzbWRkb2pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUzODk5MjQsImV4cCI6MjA3MDk2NTkyNH0.5blt8JeShSgBA50l5bcE30Um1nGlYJAl685XBdVrqdg'
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+// 환경 변수 검증
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('❌ Supabase 환경 변수가 설정되지 않았습니다!')
+  console.error('NEXT_PUBLIC_SUPABASE_URL:', supabaseUrl ? '설정됨' : '설정되지 않음')
+  console.error('NEXT_PUBLIC_SUPABASE_ANON_KEY:', supabaseAnonKey ? '설정됨' : '설정되지 않음')
+}
 
 // 연결 상태 확인
 console.log('Supabase URL:', supabaseUrl)
@@ -12,6 +19,11 @@ let supabaseInstance: SupabaseClient | null = null
 
 export const supabase = (() => {
   if (!supabaseInstance) {
+    if (!supabaseUrl || !supabaseAnonKey) {
+      console.error('❌ Supabase 클라이언트를 생성할 수 없습니다. 환경 변수를 확인해주세요.')
+      throw new Error('Supabase 환경 변수가 설정되지 않았습니다')
+    }
+    
     supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
         persistSession: true,

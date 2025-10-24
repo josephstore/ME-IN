@@ -8,7 +8,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test": "node scripts/run-tests.js",
+    "test:system": "node scripts/system-test.js",
+    "init:data": "node scripts/init_sample_data.js",
+    "deploy": "npm run build && npm run start"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.55.0",

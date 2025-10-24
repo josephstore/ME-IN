@@ -1,0 +1,10 @@
+[33ma939867[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Fix registration and improve network connection handling
+[33ma15f90b[m Remove dummy data and implement real Supabase functionality
+[33m61556f4[m Fix UI issues and campaign creation errors
+[33m28f45d6[m Test and improve campaign creation and influencer registration functionality
+[33ma731e80[m Improve UX: Move campaign creation button to header for better user experience
+[33m7b99e4c[m Fix: Restore ME-IN logo and improve campaign creation functionality
+[33ma4a8fcc[m Deploy: Notification icon position fix and enhanced filter functionality
+[33m95cc175[m Fix notification icon position: Move to right side of navigation bar
+[33mefa84fb[m Improve UI: Move notification icon to top navigation and enhance filter functionality
+[33m311eda2[m Auto-deploy:  - ?먮룞 諛고룷

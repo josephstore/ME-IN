@@ -1,0 +1,24 @@
+[core]
+    pager = cat
+    editor = notepad
+    autocrlf = true
+    safecrlf = false
+[init]
+    defaultBranch = main
+[pull]
+    rebase = false
+[push]
+    default = simple
+[user]
+    name = ME-IN Developer
+    email = developer@me-in.com
+[alias]
+    st = status
+    co = checkout
+    br = branch
+    ci = commit
+    unstage = reset HEAD --
+    last = log -1 HEAD
+    visual = !gitk
+
+

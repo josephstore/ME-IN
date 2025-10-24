@@ -42,7 +42,8 @@ const defaultCampaigns: Campaign[] = [
     id: '1',
     title: 'Carery Cooling Toner',
     title_kr: '캐어리 쿨링 토너',
-    image: '/images/carery-toner.jpg',
+    image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&h=600&fit=crop',
+    media_assets: ['https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&h=600&fit=crop', 'https://images.unsplash.com/photo-1596760227605-25c4302f89c1?w=600&h=600&fit=crop'],
     price: 'From $600 - $2,500',
     category: 'Beauty'
   },
@@ -50,7 +51,8 @@ const defaultCampaigns: Campaign[] = [
     id: '2',
     title: 'K-pop Concert in Arab',
     title_kr: '케이팝 콘서트 인 아랍',
-    image: '/images/kpop-concert.jpg',
+    image: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=600&h=600&fit=crop',
+    media_assets: ['https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=600&h=600&fit=crop'],
     price: 'From $1,500 - $6,000',
     category: 'Entertainment'
   },
@@ -58,7 +60,8 @@ const defaultCampaigns: Campaign[] = [
     id: '3',
     title: 'Korean Food Festival',
     title_kr: '한국 음식 축제',
-    image: '/images/korean-food.jpg',
+    image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&h=600&fit=crop',
+    media_assets: ['https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&h=600&fit=crop'],
     price: 'From $800 - $3,000',
     category: 'Food'
   },
@@ -66,7 +69,8 @@ const defaultCampaigns: Campaign[] = [
     id: '4',
     title: 'Dubai Travel Guide',
     title_kr: '두바이 여행 가이드',
-    image: '/images/dubai-travel.jpg',
+    image: 'https://images.unsplash.com/photo-1512453333589-d3bb32f07e03?w=600&h=600&fit=crop',
+    media_assets: ['https://images.unsplash.com/photo-1512453333589-d3bb32f07e03?w=600&h=600&fit=crop'],
     price: 'From $1,000 - $5,000',
     category: 'Travel'
   }
@@ -92,14 +96,11 @@ export default function CampaignHomePage() {
     if (searchParams.get('campaign_created') === 'true') {
       setShowSuccessMessage(true)
       setSuccessMessageType('campaign')
-      // 캠페인 생성 후 데이터 새로고침
       loadCampaigns()
-      // URL에서 파라미터 제거
       const newUrl = new URL(window.location.href)
       newUrl.searchParams.delete('campaign_created')
       window.history.replaceState({}, '', newUrl.toString())
       
-      // 5초 후 메시지 숨기기
       setTimeout(() => {
         setShowSuccessMessage(false)
         setSuccessMessageType(null)
@@ -107,12 +108,10 @@ export default function CampaignHomePage() {
     } else if (searchParams.get('influencer_registered') === 'true') {
       setShowSuccessMessage(true)
       setSuccessMessageType('influencer')
-      // URL에서 파라미터 제거
       const newUrl = new URL(window.location.href)
       newUrl.searchParams.delete('influencer_registered')
       window.history.replaceState({}, '', newUrl.toString())
       
-      // 5초 후 메시지 숨기기
       setTimeout(() => {
         setShowSuccessMessage(false)
         setSuccessMessageType(null)
@@ -126,7 +125,6 @@ export default function CampaignHomePage() {
       const response = await CampaignService.getCampaigns()
       
       if (response && Array.isArray(response) && response.length > 0) {
-        // 실제 데이터를 Campaign 인터페이스에 맞게 변환
         const convertedCampaigns = response.map((campaign: any) => ({
           id: campaign.id,
           title: campaign.title,
@@ -149,12 +147,10 @@ export default function CampaignHomePage() {
         }))
         setCampaigns(convertedCampaigns)
       } else {
-        // 데이터 로드 실패 시 기본 데이터 사용
         setCampaigns(defaultCampaigns)
       }
     } catch (error) {
       console.error('캠페인 로드 오류:', error)
-      // 오류 시 기본 데이터 사용
       setCampaigns(defaultCampaigns)
     } finally {
       setLoading(false)
@@ -187,106 +183,105 @@ export default function CampaignHomePage() {
   return (
     <div className="min-h-screen bg-beige-50">
       {/* Search Bar */}
+      <div className="px-4 pb-3">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search campaigns..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full px-4 py-3 pl-12 bg-beige-100 rounded-lg text-navy-600 placeholder-navy-400 focus:outline-none focus:ring-2 focus:ring-salmon-500"
+          />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-navy-400" />
+          <button className="absolute right-4 top-1/2 transform -translate-y-1/2">
+            <Filter className="w-5 h-5 text-navy-400" />
+          </button>
+        </div>
+      </div>
+
+      {/* Success Message */}
+      {showSuccessMessage && (
         <div className="px-4 pb-3">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search campaigns..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-3 pl-12 bg-beige-100 rounded-lg text-navy-600 placeholder-navy-400 focus:outline-none focus:ring-2 focus:ring-salmon-500"
-            />
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-navy-400" />
-            <button className="absolute right-4 top-1/2 transform -translate-y-1/2">
-              <Filter className="w-5 h-5 text-navy-400" />
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center space-x-3">
+            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-green-800">
+                {successMessageType === 'campaign' 
+                  ? '캠페인이 성공적으로 생성되었습니다! / تم إنشاء الحملة بنجاح!'
+                  : '인플루언서 등록이 완료되었습니다! / تم تسجيل المؤثر بنجاح!'
+                }
+              </p>
+              <p className="text-xs text-green-600 mt-1">
+                {successMessageType === 'campaign'
+                  ? '아래에서 새로 생성된 캠페인을 확인할 수 있습니다.'
+                  : '이제 캠페인에 참여하고 브랜드와 협업할 수 있습니다.'
+                }
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                setShowSuccessMessage(false)
+                setSuccessMessageType(null)
+              }}
+              className="text-green-400 hover:text-green-600"
+            >
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
+      )}
 
-        {/* Success Message */}
-        {showSuccessMessage && (
-          <div className="px-4 pb-3">
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center space-x-3">
-              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-              <div className="flex-1">
-                <p className="text-sm font-medium text-green-800">
-                  {successMessageType === 'campaign' 
-                    ? '캠페인이 성공적으로 생성되었습니다! / تم إنشاء الحملة بنجاح!'
-                    : '인플루언서 등록이 완료되었습니다! / تم تسجيل المؤثر بنجاح!'
-                  }
-                </p>
-                <p className="text-xs text-green-600 mt-1">
-                  {successMessageType === 'campaign'
-                    ? '아래에서 새로 생성된 캠페인을 확인할 수 있습니다.'
-                    : '이제 캠페인에 참여하고 브랜드와 협업할 수 있습니다.'
-                  }
-                </p>
-              </div>
-              <button
-                onClick={() => {
-                  setShowSuccessMessage(false)
-                  setSuccessMessageType(null)
-                }}
-                className="text-green-400 hover:text-green-600"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Filter Section */}
-        <div className="px-4 pb-3">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-medium text-navy-600">필터</h3>
-            {activeFilters.length > 0 && (
-              <button
-                onClick={clearAllFilters}
-                className="text-xs text-navy-400 hover:text-navy-600"
-              >
-                모두 지우기
-              </button>
-            )}
-          </div>
-          
-          {/* Available Filters */}
-          <div className="flex flex-wrap gap-2 mb-3">
-            {availableFilters.map(filter => (
-              <button
-                key={filter}
-                onClick={() => activeFilters.includes(filter) ? removeFilter(filter) : addFilter(filter)}
-                className={`px-3 py-1 rounded-full text-sm transition-colors ${
-                  activeFilters.includes(filter)
-                    ? 'bg-navy-600 text-white'
-                    : 'bg-white border border-beige-300 text-navy-600 hover:bg-navy-50'
-                }`}
-              >
-                {filter}
-              </button>
-            ))}
-          </div>
-
-          {/* Active Filters */}
+      {/* Filter Section */}
+      <div className="px-4 pb-3">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-medium text-navy-600">필터</h3>
           {activeFilters.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              <span className="text-xs text-navy-500">선택된 필터:</span>
-              {activeFilters.map(filter => (
-                <div
-                  key={filter}
-                  className="flex items-center space-x-1 bg-navy-100 border border-navy-200 rounded-full px-3 py-1"
-                >
-                  <span className="text-sm text-navy-700">{filter}</span>
-                  <button
-                    onClick={() => removeFilter(filter)}
-                    className="ml-1 hover:bg-navy-200 rounded-full p-0.5"
-                  >
-                    <X className="w-3 h-3 text-navy-500" />
-                  </button>
-                </div>
-              ))}
-            </div>
+            <button
+              onClick={clearAllFilters}
+              className="text-xs text-navy-400 hover:text-navy-600"
+            >
+              모두 지우기
+            </button>
           )}
         </div>
+        
+        {/* Available Filters */}
+        <div className="flex flex-wrap gap-2 mb-3">
+          {availableFilters.map(filter => (
+            <button
+              key={filter}
+              onClick={() => activeFilters.includes(filter) ? removeFilter(filter) : addFilter(filter)}
+              className={`px-3 py-1 rounded-full text-sm transition-colors ${
+                activeFilters.includes(filter)
+                  ? 'bg-navy-600 text-white'
+                  : 'bg-white border border-beige-300 text-navy-600 hover:bg-navy-50'
+              }`}
+            >
+              {filter}
+            </button>
+          ))}
+        </div>
+
+        {/* Active Filters */}
+        {activeFilters.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            <span className="text-xs text-navy-500">선택된 필터:</span>
+            {activeFilters.map(filter => (
+              <div
+                key={filter}
+                className="flex items-center space-x-1 bg-navy-100 border border-navy-200 rounded-full px-3 py-1"
+              >
+                <span className="text-sm text-navy-700">{filter}</span>
+                <button
+                  onClick={() => removeFilter(filter)}
+                  className="ml-1 hover:bg-navy-200 rounded-full p-0.5"
+                >
+                  <X className="w-3 h-3 text-navy-500" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Campaign Cards */}
@@ -311,15 +306,7 @@ export default function CampaignHomePage() {
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement
-                      target.src = `data:image/svg+xml;base64,${btoa(`
-                        <svg width="400" height="200" xmlns="http://www.w3.org/2000/svg">
-                          <rect width="400" height="200" fill="#f3f4f6"/>
-                          <text x="200" y="100" font-family="Arial, sans-serif" font-size="16" 
-                                text-anchor="middle" fill="#6b7280">
-                            ${campaign.title}
-                          </text>
-                        </svg>
-                      `)}`
+                      target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjIwMCIgeT0iMTAwIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM2YjcyODAiPkltYWdlPC90ZXh0Pjwvc3ZnPg=='
                     }}
                   />
                 </div>
@@ -333,34 +320,14 @@ export default function CampaignHomePage() {
                     <span className="text-sm font-medium text-navy-600">{campaign.price}</span>
                   </div>
                   
-                  <h3 className="font-semibold text-navy-600 mb-1 text-responsive-lg text-wrap-balance">{campaign.title}</h3>
-                  <p className="text-responsive-sm text-navy-500 mb-3 text-wrap-pretty">{campaign.title_kr}</p>
+                  <h3 className="font-semibold text-navy-600 mb-1 text-lg">{campaign.title}</h3>
+                  <p className="text-sm text-navy-500 mb-3">{campaign.title_kr}</p>
                   
                   {/* Campaign Description */}
                   <div className="mb-4">
                     {campaign.description && (
-                      <p className="text-responsive-sm text-navy-400 mb-2 text-wrap-pretty">
+                      <p className="text-sm text-navy-400 mb-2">
                         {campaign.description}
-                      </p>
-                    )}
-                    {!campaign.description && campaign.id === '1' && (
-                      <p className="text-responsive-sm text-navy-400 mb-2 text-wrap-pretty">
-                        Carery 토너의 효과와 사용법을 소개하는 뷰티 콘텐츠를 제작해주세요.
-                      </p>
-                    )}
-                    {!campaign.description && campaign.id === '2' && (
-                      <p className="text-responsive-sm text-navy-400 mb-2 text-wrap-pretty">
-                        중동 지역 K-POP 콘서트를 홍보하는 에너지 넘치는 콘텐츠를 제작해주세요.
-                      </p>
-                    )}
-                    {!campaign.description && campaign.id === '3' && (
-                      <p className="text-responsive-sm text-navy-400 mb-2 text-wrap-pretty">
-                        한국의 전통 음식과 현대적인 한식을 소개하는 콘텐츠를 제작해주세요.
-                      </p>
-                    )}
-                    {!campaign.description && campaign.id === '4' && (
-                      <p className="text-responsive-sm text-navy-400 mb-2 text-wrap-pretty">
-                        두바이의 아름다운 관광지를 소개하는 여행 콘텐츠를 제작해주세요.
                       </p>
                     )}
                   </div>
@@ -416,7 +383,6 @@ export default function CampaignHomePage() {
           +
         </button>
       </div>
-
 
       {/* Bottom Spacing for Navigation */}
       <div className="h-20"></div>

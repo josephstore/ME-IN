@@ -65,3 +65,5 @@ VALUES (
     '/images/avatar.jpg'
 ) ON CONFLICT DO NOTHING;
 
+
+
